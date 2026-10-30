@@ -1,0 +1,17 @@
+[project]
+name = "gloss"
+version = "0.1.0"
+description = "Ask your data, grounded in your definitions: an MCP server, RAG over metric definitions and a LangGraph agent, with a measured evaluation."
+requires-python = ">=3.10"
+dependencies = ["duckdb>=1.0", "sqlglot>=25", "pyyaml>=6"]
+
+[project.optional-dependencies]
+agent = ["mcp", "langgraph", "langchain", "langchain-google-genai", "langsmith"]
+app = ["gradio"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
