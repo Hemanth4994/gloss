@@ -1,0 +1,185 @@
+# Gloss data dictionary. Everything here is about a SYNTHETIC online store (see datagen.py).
+#
+# Each rule, table and metric becomes one retrievable chunk. The `definition` text is what the agent may retrieve.
+# The `sql` field is a reference implementation used only by the tests (it is checked against an independent
+# Python calculation) and by the evaluation's gold answers. It is NOT given to the agent.
+
+as_of_date: "2026-09-30"        # "today" for relative metrics, as an IST date
+
+rules:
+  - name: reporting_timezone
+    definition: >
+      All business dates, days and months are in IST (UTC+05:30). Timestamps in the database are stored in UTC.
+      To get the IST date of a timestamp, add 5 hours 30 minutes before taking the date. An order placed at
+      20:00 UTC on 3 March belongs to 4 March in IST.
+  - name: test_accounts
+    definition: >
+      Customers with is_test = true are internal test accounts. Exclude them, and all of their orders,
+      from every metric and every count.
+  - name: order_status
+    definition: >
+      orders.status is one of completed, cancelled, returned, pending. completed means delivered and kept.
+      cancelled means the customer or the store cancelled it before delivery. returned means it was delivered and
+      then sent back. pending means it is placed but not yet delivered; pending orders are not counted in revenue
+      or in cancellation and return rates.
+  - name: money_units
+    definition: >
+      All amounts are whole Indian rupees (INR) stored as integers. An order's item total is the sum of
+      quantity * unit_price over its order_items. orders.discount_amount is a discount on the whole order.
+  - name: as_of_date
+    definition: >
+      When a question says "today", "now", "currently" or "recently", use the as-of date 2026-09-30 (an IST date).
+      The data ends on that day.
+
+tables:
+  customers:
+    description: One row per customer account.
+    columns:
+      customer_id: Primary key.
+      signup_at: When the account was created (UTC). Signing up is not the same as buying.
+      city: Customer's city.
+      is_test: True for internal test accounts (see rule test_accounts).
+      acquisition_channel: How the customer arrived, one of organic, paid_search, social, referral.
+  orders:
+    description: One row per order placed (all statuses).
+    columns:
+      order_id: Primary key.
+      customer_id: Foreign key to customers.
+      ordered_at: When the order was placed (UTC).
+      status: completed, cancelled, returned or pending (see rule order_status).
+      payment_method: upi, card or cod (cash on delivery).
+      discount_amount: Discount on the whole order, in rupees.
+  order_items:
+    description: One row per product line in an order. Joins to orders on order_id.
+    columns:
+      order_item_id: Primary key.
+      order_id: Foreign key to orders.
+      category: grocery, snacks, beverages, personal_care, home or electronics.
+      quantity: Units bought.
+      unit_price: Price per unit in rupees.
+  refunds:
+    description: >
+      Money returned to customers. One order can have zero or one refund. A returned order's refund is its full value;
+      a completed order can have a partial refund. Kept in its own table, so joining it to order_items multiplies rows.
+    columns:
+      refund_id: Primary key.
+      order_id: Foreign key to orders.
+      refund_amount: Rupees refunded.
+      refunded_at: When the refund was made (UTC).
+
+metrics:
+  - name: gmv
+    title: Gross merchandise value (GMV)
+    definition: >
+      The total value of goods ordered, before discounts and refunds: the sum of quantity * unit_price over order_items
+      of non-test orders whose status is not cancelled. Pending and returned orders are included.
+    sql: >
+      SELECT SUM(oi.quantity * oi.unit_price) AS gmv
+      FROM order_items oi
+      JOIN orders o ON o.order_id = oi.order_id
+      JOIN customers c ON c.customer_id = o.customer_id
+      WHERE NOT c.is_test AND o.status <> 'cancelled'
+  - name: net_revenue
+    title: Net revenue
+    definition: >
+      Revenue actually kept. For each completed order of a non-test customer, take the item total, subtract the order's
+      discount_amount, and subtract any refund on that order. Add these up. Returned, cancelled and pending orders
+      contribute nothing, and the refunds of returned orders are NOT subtracted again. For a time period, an order
+      and its refund belong to the IST month or day of the order's ordered_at, not of the refund date.
+    sql: >
+      WITH item_totals AS (
+        SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id
+      ), refund_totals AS (
+        SELECT order_id, SUM(refund_amount) AS refunded FROM refunds GROUP BY order_id
+      )
+      SELECT SUM(i.items_total - o.discount_amount - COALESCE(r.refunded, 0)) AS net_revenue
+      FROM orders o
+      JOIN customers c ON c.customer_id = o.customer_id
+      JOIN item_totals i ON i.order_id = o.order_id
+      LEFT JOIN refund_totals r ON r.order_id = o.order_id
+      WHERE o.status = 'completed' AND NOT c.is_test
+  - name: aov
+    title: Average order value (AOV)
+    definition: >
+      The average of (item total minus discount_amount) over completed orders of non-test customers. Refunds are
+      not subtracted. Returned, cancelled and pending orders are excluded.
+    sql: >
+      WITH item_totals AS (
+        SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id
+      )
+      SELECT SUM(i.items_total - o.discount_amount) * 1.0 / COUNT(*) AS aov
+      FROM orders o
+      JOIN customers c ON c.customer_id = o.customer_id
+      JOIN item_totals i ON i.order_id = o.order_id
+      WHERE o.status = 'completed' AND NOT c.is_test
+  - name: active_customer
+    title: Active customer
+    definition: >
+      A non-test customer with at least one completed order whose IST order date falls in the 90 days ending on the
+      as-of date, inclusive of both ends (that is, from as-of minus 89 days up to the as-of date).
+    sql: >
+      SELECT COUNT(DISTINCT o.customer_id) AS active_customers
+      FROM orders o JOIN customers c ON c.customer_id = o.customer_id
+      WHERE o.status = 'completed' AND NOT c.is_test
+        AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE)
+            BETWEEN CAST(DATE '2026-09-30' - INTERVAL 89 DAY AS DATE) AND DATE '2026-09-30'
+  - name: new_customer
+    title: New customer
+    definition: >
+      A customer is new in a period if the IST date of their first completed order falls in that period. This is
+      about the first purchase, not the signup date. Test accounts are excluded.
+    sql: >
+      WITH first_orders AS (
+        SELECT o.customer_id, MIN(CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE)) AS first_day
+        FROM orders o JOIN customers c ON c.customer_id = o.customer_id
+        WHERE o.status = 'completed' AND NOT c.is_test
+        GROUP BY o.customer_id
+      )
+      SELECT COUNT(*) AS new_customers FROM first_orders
+      WHERE first_day >= DATE '2026-08-01' AND first_day < DATE '2026-09-01'
+  - name: repeat_customer
+    title: Repeat customer
+    definition: >
+      A non-test customer with two or more completed orders, counted over all time.
+    sql: >
+      SELECT COUNT(*) AS repeat_customers FROM (
+        SELECT o.customer_id FROM orders o JOIN customers c ON c.customer_id = o.customer_id
+        WHERE o.status = 'completed' AND NOT c.is_test
+        GROUP BY o.customer_id HAVING COUNT(*) >= 2
+      )
+  - name: cancellation_rate
+    title: Cancellation rate
+    definition: >
+      Cancelled orders divided by all orders that are completed, cancelled or returned, for non-test customers.
+      Pending orders are left out of both the numerator and the denominator.
+    sql: >
+      SELECT SUM(CASE WHEN o.status = 'cancelled' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS cancellation_rate
+      FROM orders o JOIN customers c ON c.customer_id = o.customer_id
+      WHERE NOT c.is_test AND o.status IN ('completed', 'cancelled', 'returned')
+  - name: return_rate
+    title: Return rate
+    definition: >
+      Returned orders divided by orders that were delivered (completed plus returned), for non-test customers.
+      Cancelled and pending orders are excluded from both parts.
+    sql: >
+      SELECT SUM(CASE WHEN o.status = 'returned' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS return_rate
+      FROM orders o JOIN customers c ON c.customer_id = o.customer_id
+      WHERE NOT c.is_test AND o.status IN ('completed', 'returned')
+  - name: customer_ltv
+    title: Customer lifetime value (to date)
+    definition: >
+      A customer's net revenue over all time, using the same rules as net revenue: completed orders only, minus
+      discounts, minus refunds on those orders. Customers with no completed orders have a value of zero.
+    sql: >
+      WITH item_totals AS (
+        SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id
+      ), refund_totals AS (
+        SELECT order_id, SUM(refund_amount) AS refunded FROM refunds GROUP BY order_id
+      )
+      SELECT o.customer_id, SUM(i.items_total - o.discount_amount - COALESCE(r.refunded, 0)) AS ltv
+      FROM orders o
+      JOIN customers c ON c.customer_id = o.customer_id
+      JOIN item_totals i ON i.order_id = o.order_id
+      LEFT JOIN refund_totals r ON r.order_id = o.order_id
+      WHERE o.status = 'completed' AND NOT c.is_test
+      GROUP BY o.customer_id

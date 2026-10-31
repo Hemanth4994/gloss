@@ -7,9 +7,13 @@ measured evaluation of when the agent is right, wrong, or should refuse.
 
 ## What exists
 
-- `src/gloss/sqlguard.py`: static checks on model-written SQL (one SELECT, named allow-listed tables, no table functions).
-- `src/gloss/warehouse.py`: read-only DuckDB connection with no file or network access, a row cap and a timeout.
-- 21 unit tests: `PYTHONPATH=src python -m unittest discover -s tests`
+- `src/gloss/datagen.py`: synthetic online-store data with a fixed seed and planted traps (test accounts, cancelled and returned orders, refunds in their own table, UTC timestamps reported in IST) plus a known number of injected dirty rows.
+- `src/gloss/pipeline.py`: loads the rows into DuckDB with documented quality rules and writes a data-quality report. A test checks that the report matches exactly what was injected.
+- `src/gloss/dictionary.yaml`: rules, table descriptions and nine metric definitions. Each metric has reference SQL, used only by tests and gold answers, never shown to the agent.
+- `src/gloss/sqlguard.py` and `warehouse.py`: static checks on model-written SQL, then a read-only connection with no file or network access, a row cap and a timeout.
+- 45 tests: `PYTHONPATH=src:tests python -m unittest discover -s tests`. They include a check of every metric's SQL against an independent pure-Python calculation, and a check that each planted trap really changes the answer.
+
+Build the warehouse: `PYTHONPATH=src python -m gloss.pipeline --out data/gloss.duckdb`
 
 ## Sources used when planning
 
