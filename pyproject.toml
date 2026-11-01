@@ -6,7 +6,7 @@ requires-python = ">=3.10"
 dependencies = ["duckdb>=1.0", "sqlglot>=25", "pyyaml>=6", "mcp>=2.0", "uvicorn"]
 
 [project.optional-dependencies]
-agent = ["langgraph", "langchain", "langchain-google-genai", "langsmith"]
+agent = ["langgraph", "langchain-core", "langchain-google-genai", "langsmith"]
 app = ["gradio"]
 
 [build-system]

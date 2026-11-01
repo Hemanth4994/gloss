@@ -65,6 +65,20 @@ class TestWarehouse(unittest.TestCase):
         with self.assertRaises(duckdb.Error):
             self.con.execute("SET enable_external_access = true")
 
+    def test_a_second_connection_in_the_same_process_is_just_as_locked_down(self):
+        """An app that opens the warehouse twice (server and agent) must not crash, and must not end up less protected."""
+        second = connect_readonly(self.path)
+        try:
+            self.assertEqual(table_names(second), self.tables)
+            with self.assertRaises(duckdb.Error):
+                second.execute("CREATE TABLE x AS SELECT 1")
+            with self.assertRaises(duckdb.Error):
+                second.execute(f"SELECT * FROM read_csv('{self.csv}')").fetchall()
+            with self.assertRaises(duckdb.Error):
+                second.execute("SET enable_external_access = true")
+        finally:
+            second.close()
+
 
 if __name__ == "__main__":
     unittest.main()

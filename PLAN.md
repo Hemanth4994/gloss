@@ -63,7 +63,9 @@ written by me, so the test is "does the agent use supplied definitions correctly
 - Done ahead of schedule (Sun 1 Nov): data generator and loader, data dictionary, MCP server over stdio and HTTP, BM25, the 60 questions
   with gold SQL, the scorer, and the retrieval check on the dev split.
 - Retrieval choice, made on dev only: all rule chunks plus the BM25 top 3. Plain BM25 gave every needed chunk for 5% of dev questions.
-- Next: the LangGraph agent and LangSmith tracing (Mon 2 Nov), then dev runs and tuning, then the freeze tag before any test run.
+- Agent (`agent.py`), request throttle and evaluation runner (`scripts/run_eval.py`) written and tested with a scripted fake model.
+  Never run against a real model yet.
+- Next: a one-question smoke test with a real key, dev runs in both configurations, fixes made on dev only, then the freeze tag before any test run.
 
 ## Not doing
 

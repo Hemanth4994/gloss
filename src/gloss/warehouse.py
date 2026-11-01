@@ -37,7 +37,13 @@ class QueryResult:
 
 def connect_readonly(path: str) -> duckdb.DuckDBPyConnection:
     con = duckdb.connect(path, read_only=True, config={"enable_external_access": False})
-    con.execute("SET lock_configuration = true")
+    try:
+        con.execute("SET lock_configuration = true")
+    except duckdb.InvalidInputException as exc:
+        # Connections to the same file in one process share one database instance. A second connection finds it already locked,
+        # which is the state we want, so that is fine. Anything else is a real error.
+        if "locked" not in str(exc):
+            raise
     return con
 
 

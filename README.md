@@ -3,7 +3,7 @@
 Ask your data, grounded in your definitions. An open-source MCP server and a LangGraph agent for a data warehouse, with a
 measured evaluation of when the agent is right, wrong, or should refuse.
 
-**Status: data, definitions, MCP server and the evaluation set are built. The agent is not built yet, so there is no accuracy result yet.**
+**Status: data, definitions, MCP server, evaluation set and agent are built. The agent has been tested only with a scripted fake model; it has not been run against a real model yet, so there is no accuracy result.**
 The only number so far is a retrieval check on the development questions (below). See [PLAN.md](PLAN.md).
 
 ## What exists
@@ -16,7 +16,10 @@ The only number so far is a retrieval check on the development questions (below)
 - `src/gloss/tools.py` and `mcp_server.py`: four read-only tools (`list_tables`, `describe_table`, `search_definitions`, `run_sql`) served over MCP with the official Python SDK (v2), over stdio or streamable HTTP. A refused or failed query returns a tool error the model can read.
 - `eval/questions.yaml`, `src/gloss/evaluation.py`: 60 questions, 30 dev and 30 test, each split with 12 definition questions, 8 join questions, 5 raw-table controls and 5 questions the data cannot answer (the right behaviour is to refuse). Gold SQL is written with macros so each trap (`test` accounts, `tz` IST vs UTC, `status`, `refund`) can be switched off to give a plausible wrong query. Tests prove every listed trap changes the answer, and that nothing is listed that does not. `eval/gold_answers.json` is the stored answer key; `scripts/make_gold.py` rebuilds it.
 - Scoring is execution accuracy: the result of the agent's final SQL is compared with the gold result (column names ignored, extra columns allowed, integers exact, other numbers within the stated decimals, row order only for top-N questions). A refusal is correct only on the unanswerable questions. A scorer test replays the gold SQL (100%), refuses everything, never refuses, and ignores every definition, and checks each lands where it should.
-- 85 tests: `PYTHONPATH=src:tests python -m unittest discover -s tests`. They include a check of every metric's SQL against an independent pure-Python calculation, a check that each planted trap really changes the answer, calls through a real in-process MCP client, and the evaluation-set checks above.
+- `src/gloss/agent.py`: a LangGraph graph (retrieve, plan, execute, repair at most twice, then answer, refuse or fail) around the same tool functions the MCP server exposes. The model is injected as a plain function and returns structured output (`sql`, `definitions_used`, `assumptions`, `answerable`, `refusal_reason`). At most 3 model calls per question. The answer text is built from the query result and the cited definitions, not written by the model. Two configurations, `definitions` (all rules plus BM25 top 3) and `none` (bare schema only), share one system prompt that contains no business rule, and a test checks that. Each run carries LangSmith tags and metadata.
+- `src/gloss/throttle.py`: request pacing for the free-tier rate limit, waits out per-minute 429s, stops cleanly on a daily quota.
+- `scripts/run_eval.py`: runs a split in one configuration, scores it, resumes after an interruption, records the model that answered and hashes of the prompt, questions and answer key. The test split refuses to run unless the tag `frozen-v1` exists and `src/`, `eval/`, `scripts/` and `tests/` match it exactly.
+- 114 tests: `PYTHONPATH=src:tests python -m unittest discover -s tests` (the agent tests need `pip install -e ".[agent]"` and are skipped without it). They include a check of every metric's SQL against an independent pure-Python calculation, a check that each planted trap really changes the answer, calls through a real in-process MCP client, and the evaluation-set checks above.
 
 Build the warehouse, then serve it:
 

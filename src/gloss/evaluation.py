@@ -56,6 +56,7 @@ MACROS: dict[str, tuple[str, dict[str, str]]] = {
 }
 _MACRO = re.compile(r"\{([A-Z_]+)((?: [^{}]*)?)\}")
 _ISO = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_MIDNIGHT = re.compile(r"(\d{4}-\d{2}-\d{2})[T ]00:00:00(?:\.0+)?")
 
 
 def expand(sql: str, mutation: str | None = None) -> str:
@@ -157,7 +158,10 @@ def snapshot(res: QueryResult) -> dict:
 
 def _norm(v):
     """One cell in a form that compares and serialises the same way everywhere (ints stay ints, other numbers become floats)."""
-    if v is None or isinstance(v, (bool, str, int)):
+    if isinstance(v, str):                      # the agent's rows arrive as JSON, so a midnight timestamp is a string
+        m = _MIDNIGHT.fullmatch(v)
+        return m.group(1) if m else v
+    if v is None or isinstance(v, (bool, int)):
         return v
     if isinstance(v, (float, decimal.Decimal)):
         return float(v)
