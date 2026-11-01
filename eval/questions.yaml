@@ -1,0 +1,655 @@
+# Gloss evaluation questions: 60 in total, 30 dev and 30 test.
+#
+# dev  : used to build and tune the agent, the prompts and the retrieval settings.
+# test : frozen before the agent is ever run on it (git tag frozen-v1). Run once per configuration.
+#
+# Fields
+#   kind      definition | join | control | unanswerable
+#   needs     rule: and metric: chunk ids a correct answer depends on (used only to score retrieval)
+#   traps     mutations that must change the gold result: test, tz, status, refund. tests/test_eval_set.py proves they do,
+#             so a question cannot quietly be answerable without the definition it claims to need.
+#   anti      controls only: a query that wrongly applies a rule. It must NOT reproduce the gold result.
+#   ordered   true if row order matters (top-N questions)
+#   places    decimals compared for non-integer numbers (default 2). Integers always match exactly.
+#   gold      reference SQL with macros, see gloss/evaluation.py. The agent never sees it.
+#
+# These questions and the dictionary were written by the same author, so this set measures whether the agent USES supplied
+# definitions correctly. It does not measure whether it could discover a company's conventions on its own.
+
+# ======================================================== definition questions: dev
+
+- id: d01
+  split: dev
+  kind: definition
+  question: What was net revenue in August 2026?
+  needs: [metric:net_revenue, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status, refund]
+  gold: |
+    WITH {ITEM_TOTALS}, {REFUND_TOTALS}
+    SELECT SUM({NET_VALUE}) AS net_revenue
+    {NET_FROM}
+    WHERE {COMPLETED} AND {REAL} AND {IST_RANGE 2026-08-01 2026-08-31}
+
+- id: d02
+  split: dev
+  kind: definition
+  question: What is our average order value (AOV), to 2 decimals?
+  needs: [metric:aov, rule:order_status, rule:test_accounts]
+  traps: [test, status]
+  gold: |
+    WITH {ITEM_TOTALS}
+    SELECT SUM(i.items_total - o.discount_amount) * 1.0 / COUNT(*) AS aov
+    {ITEMS_FROM}
+    WHERE {COMPLETED} AND {REAL}
+
+- id: d03
+  split: dev
+  kind: definition
+  question: How many active customers do we have today?
+  needs: [metric:active_customer, rule:as_of_date, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status]
+  gold: |
+    SELECT COUNT(DISTINCT o.customer_id) AS active_customers
+    {ORDERS_C}
+    WHERE {COMPLETED} AND {REAL} AND {IST_RANGE 2026-07-03 2026-09-30}
+
+- id: d04
+  split: dev
+  kind: definition
+  question: How many new customers did we get in July 2026?
+  needs: [metric:new_customer, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status]
+  gold: |
+    WITH {FIRST_ORDERS}
+    SELECT COUNT(*) AS new_customers FROM first_orders
+    WHERE first_day BETWEEN DATE '2026-07-01' AND DATE '2026-07-31'
+
+- id: d05
+  split: dev
+  kind: definition
+  question: >
+    What is the cancellation rate for this year so far? Give it as a fraction between 0 and 1, rounded to 4 decimals.
+  needs: [metric:cancellation_rate, rule:relative_periods, rule:order_status]
+  traps: [status]
+  places: 4
+  gold: |
+    SELECT SUM(CASE WHEN o.status = 'cancelled' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS cancellation_rate
+    {ORDERS_C}
+    WHERE {REAL} AND {DECIDED} AND {IST_RANGE 2026-01-01 2026-09-30}
+
+- id: d06
+  split: dev
+  kind: definition
+  question: What was GMV last month?
+  needs: [metric:gmv, rule:relative_periods, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status]
+  gold: |
+    SELECT SUM(oi.quantity * oi.unit_price) AS gmv
+    {GMV_FROM}
+    WHERE {REAL} AND {NOT_CANCELLED} AND {IST_RANGE 2026-08-01 2026-08-31}
+
+- id: d07
+  split: dev
+  kind: definition
+  question: How many orders were placed on 15 August 2026?
+  needs: [rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz]
+  gold: |
+    SELECT COUNT(*) AS orders
+    {ORDERS_C}
+    WHERE {REAL} AND {IST_RANGE 2026-08-15 2026-08-15}
+
+- id: d08
+  split: dev
+  kind: definition
+  question: How many orders are still pending?
+  needs: [rule:order_status, rule:test_accounts]
+  traps: [test]
+  gold: |
+    SELECT COUNT(*) AS pending_orders
+    {ORDERS_C}
+    WHERE {REAL} AND o.status = 'pending'
+
+- id: d09
+  split: dev
+  kind: definition
+  question: How many repeat customers do we have?
+  needs: [metric:repeat_customer, rule:test_accounts]
+  traps: [test, status]
+  gold: |
+    SELECT COUNT(*) AS repeat_customers FROM (
+      SELECT o.customer_id {ORDERS_C}
+      WHERE {COMPLETED} AND {REAL}
+      GROUP BY o.customer_id HAVING COUNT(*) >= 2
+    )
+
+- id: d10
+  split: dev
+  kind: definition
+  question: Who are our top 5 customers by lifetime value? Return the customer id and the value.
+  needs: [metric:customer_ltv, rule:test_accounts]
+  traps: [test, status]
+  ordered: true
+  gold: |
+    WITH {ITEM_TOTALS}, {REFUND_TOTALS},
+    ltv AS (SELECT o.customer_id, SUM({NET_VALUE}) AS ltv {NET_FROM} WHERE {COMPLETED} AND {REAL} GROUP BY o.customer_id)
+    SELECT customer_id, ltv FROM ltv ORDER BY ltv DESC, customer_id LIMIT 5
+
+- id: d11
+  split: dev
+  kind: definition
+  question: What was net revenue over the last 7 days?
+  needs: [metric:net_revenue, rule:relative_periods, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status, refund]
+  gold: |
+    WITH {ITEM_TOTALS}, {REFUND_TOTALS}
+    SELECT SUM({NET_VALUE}) AS net_revenue
+    {NET_FROM}
+    WHERE {COMPLETED} AND {REAL} AND {IST_RANGE 2026-09-24 2026-09-30}
+
+- id: d12
+  split: dev
+  kind: definition
+  question: >
+    What was the return rate in August 2026? Give it as a fraction between 0 and 1, rounded to 4 decimals.
+  needs: [metric:return_rate, rule:order_status, rule:reporting_timezone]
+  traps: [tz]
+  places: 4
+  gold: |
+    SELECT SUM(CASE WHEN o.status = 'returned' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS return_rate
+    {ORDERS_C}
+    WHERE {REAL} AND {DELIVERED} AND {IST_RANGE 2026-08-01 2026-08-31}
+
+# ======================================================== definition questions: test
+
+- id: t01
+  split: test
+  kind: definition
+  question: What was net revenue in March 2026?
+  needs: [metric:net_revenue, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status, refund]
+  gold: |
+    WITH {ITEM_TOTALS}, {REFUND_TOTALS}
+    SELECT SUM({NET_VALUE}) AS net_revenue
+    {NET_FROM}
+    WHERE {COMPLETED} AND {REAL} AND {IST_RANGE 2026-03-01 2026-03-31}
+
+- id: t02
+  split: test
+  kind: definition
+  question: What is the average order value (AOV) for card payments, to 2 decimals?
+  needs: [metric:aov, rule:order_status, rule:test_accounts]
+  traps: [test, status]
+  gold: |
+    WITH {ITEM_TOTALS}
+    SELECT SUM(i.items_total - o.discount_amount) * 1.0 / COUNT(*) AS aov
+    {ITEMS_FROM}
+    WHERE {COMPLETED} AND {REAL} AND o.payment_method = 'card'
+
+- id: t03
+  split: test
+  kind: definition
+  question: How many customers placed a completed order in the last 30 days?
+  needs: [rule:relative_periods, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status]
+  gold: |
+    SELECT COUNT(DISTINCT o.customer_id) AS customers
+    {ORDERS_C}
+    WHERE {COMPLETED} AND {REAL} AND {IST_RANGE 2026-09-01 2026-09-30}
+
+- id: t04
+  split: test
+  kind: definition
+  question: How many new customers did we get last month?
+  needs: [metric:new_customer, rule:relative_periods, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status]
+  gold: |
+    WITH {FIRST_ORDERS}
+    SELECT COUNT(*) AS new_customers FROM first_orders
+    WHERE first_day BETWEEN DATE '2026-08-01' AND DATE '2026-08-31'
+
+- id: t05
+  split: test
+  kind: definition
+  question: >
+    What was the return rate over the last 90 days? Give it as a fraction between 0 and 1, rounded to 4 decimals.
+  needs: [metric:return_rate, rule:relative_periods, rule:order_status, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status]
+  places: 4
+  gold: |
+    SELECT SUM(CASE WHEN o.status = 'returned' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS return_rate
+    {ORDERS_C}
+    WHERE {REAL} AND {DELIVERED} AND {IST_RANGE 2026-07-03 2026-09-30}
+
+- id: t06
+  split: test
+  kind: definition
+  question: >
+    What is the cancellation rate this month? Give it as a fraction between 0 and 1, rounded to 4 decimals.
+  needs: [metric:cancellation_rate, rule:relative_periods, rule:order_status, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status]
+  places: 4
+  gold: |
+    SELECT SUM(CASE WHEN o.status = 'cancelled' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS cancellation_rate
+    {ORDERS_C}
+    WHERE {REAL} AND {DECIDED} AND {IST_RANGE 2026-09-01 2026-09-30}
+
+- id: t07
+  split: test
+  kind: definition
+  question: How many orders were placed on 9 February 2026?
+  needs: [rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz]
+  gold: |
+    SELECT COUNT(*) AS orders
+    {ORDERS_C}
+    WHERE {REAL} AND {IST_RANGE 2026-02-09 2026-02-09}
+
+- id: t08
+  split: test
+  kind: definition
+  question: How many orders with status completed were placed in May 2026?
+  needs: [rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz]
+  gold: |
+    SELECT COUNT(*) AS orders
+    {ORDERS_C}
+    WHERE o.status = 'completed' AND {REAL} AND {IST_RANGE 2026-05-01 2026-05-31}
+
+- id: t09
+  split: test
+  kind: definition
+  question: What was GMV over the last 60 days?
+  needs: [metric:gmv, rule:relative_periods, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status]
+  gold: |
+    SELECT SUM(oi.quantity * oi.unit_price) AS gmv
+    {GMV_FROM}
+    WHERE {REAL} AND {NOT_CANCELLED} AND {IST_RANGE 2026-08-02 2026-09-30}
+
+- id: t10
+  split: test
+  kind: definition
+  question: What is the lifetime value of customer 2296?
+  needs: [metric:customer_ltv]
+  traps: [status, refund]
+  gold: |
+    WITH {ITEM_TOTALS}, {REFUND_TOTALS}
+    SELECT SUM({NET_VALUE}) AS ltv
+    {NET_FROM}
+    WHERE {COMPLETED} AND {REAL} AND o.customer_id = 2296
+
+- id: t11
+  split: test
+  kind: definition
+  question: How many customers have a lifetime value above 15000 rupees?
+  needs: [metric:customer_ltv, rule:test_accounts]
+  traps: [test, status, refund]
+  gold: |
+    WITH {ITEM_TOTALS}, {REFUND_TOTALS},
+    ltv AS (SELECT o.customer_id, SUM({NET_VALUE}) AS ltv {NET_FROM} WHERE {COMPLETED} AND {REAL} GROUP BY o.customer_id)
+    SELECT COUNT(*) AS customers FROM ltv WHERE ltv > 15000
+
+- id: t12
+  split: test
+  kind: definition
+  question: >
+    Of the customers with at least one completed order, what fraction are repeat customers? Give it as a fraction
+    between 0 and 1, rounded to 4 decimals.
+  needs: [metric:repeat_customer, rule:test_accounts]
+  traps: [test, status]
+  places: 4
+  gold: |
+    WITH per AS (SELECT o.customer_id, COUNT(*) AS n {ORDERS_C} WHERE {COMPLETED} AND {REAL} GROUP BY o.customer_id)
+    SELECT SUM(CASE WHEN n >= 2 THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS repeat_share FROM per
+
+# ======================================================== join questions: dev
+
+- id: j01
+  split: dev
+  kind: join
+  question: Which city had the highest net revenue? Return the city and its net revenue.
+  needs: [metric:net_revenue, rule:test_accounts]
+  traps: [test, status, refund]
+  ordered: true
+  gold: |
+    WITH {ITEM_TOTALS}, {REFUND_TOTALS}
+    SELECT c.city, SUM({NET_VALUE}) AS net_revenue
+    {NET_FROM}
+    WHERE {COMPLETED} AND {REAL}
+    GROUP BY c.city ORDER BY net_revenue DESC, c.city LIMIT 1
+
+- id: j02
+  split: dev
+  kind: join
+  question: What is GMV for each acquisition channel? Return the channel and its GMV.
+  needs: [metric:gmv, rule:test_accounts]
+  traps: [test, status]
+  gold: |
+    SELECT c.acquisition_channel, SUM(oi.quantity * oi.unit_price) AS gmv
+    {GMV_FROM}
+    WHERE {REAL} AND {NOT_CANCELLED}
+    GROUP BY c.acquisition_channel
+
+- id: j03
+  split: dev
+  kind: join
+  question: What was GMV for each product category in July 2026? Return the category and its GMV.
+  needs: [metric:gmv, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status]
+  gold: |
+    SELECT oi.category, SUM(oi.quantity * oi.unit_price) AS gmv
+    {GMV_FROM}
+    WHERE {REAL} AND {NOT_CANCELLED} AND {IST_RANGE 2026-07-01 2026-07-31}
+    GROUP BY oi.category
+
+- id: j04
+  split: dev
+  kind: join
+  question: >
+    How many new customers did we get in each month of 2026? Return the first day of the month as a date and the count,
+    ordered by month.
+  needs: [metric:new_customer, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status]
+  ordered: true
+  gold: |
+    WITH {FIRST_ORDERS}
+    SELECT CAST(DATE_TRUNC('month', first_day) AS DATE) AS month, COUNT(*) AS new_customers
+    FROM first_orders WHERE first_day >= DATE '2026-01-01'
+    GROUP BY 1 ORDER BY 1
+
+- id: j05
+  split: dev
+  kind: join
+  question: >
+    What is the cancellation rate for cash-on-delivery orders? Give it as a fraction between 0 and 1, rounded to 4 decimals.
+  needs: [metric:cancellation_rate, rule:order_status, rule:test_accounts]
+  traps: [test, status]
+  places: 4
+  gold: |
+    SELECT SUM(CASE WHEN o.status = 'cancelled' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS cancellation_rate
+    {ORDERS_C}
+    WHERE {REAL} AND o.payment_method = 'cod' AND {DECIDED}
+
+- id: j06
+  split: dev
+  kind: join
+  question: How many customers have never had a completed order?
+  needs: [rule:test_accounts]
+  traps: [test, status]
+  gold: |
+    SELECT COUNT(*) AS customers FROM customers c
+    WHERE {REAL} AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id AND {COMPLETED})
+
+- id: j07
+  split: dev
+  kind: join
+  question: What is the total amount refunded on completed orders?
+  needs: [rule:test_accounts]
+  traps: [test, status]
+  gold: |
+    SELECT SUM(r.refund_amount) AS refunded
+    FROM refunds r JOIN orders o ON o.order_id = r.order_id JOIN customers c ON c.customer_id = o.customer_id
+    WHERE {COMPLETED} AND {REAL}
+
+- id: j08
+  split: dev
+  kind: join
+  question: Which 3 cities have the most repeat customers? Return the city and the number of repeat customers.
+  needs: [metric:repeat_customer, rule:test_accounts]
+  traps: [test, status]
+  ordered: true
+  gold: |
+    WITH per AS (SELECT o.customer_id, c.city, COUNT(*) AS n {ORDERS_C} WHERE {COMPLETED} AND {REAL} GROUP BY o.customer_id, c.city HAVING COUNT(*) >= 2)
+    SELECT city, COUNT(*) AS repeat_customers FROM per GROUP BY city ORDER BY repeat_customers DESC, city LIMIT 3
+
+# ======================================================== join questions: test
+
+- id: j09
+  split: test
+  kind: join
+  question: Which acquisition channel brought in the most new customers? Return the channel and the count.
+  needs: [metric:new_customer, rule:test_accounts]
+  traps: [test, status]
+  ordered: true
+  gold: |
+    WITH {FIRST_ORDERS}
+    SELECT acquisition_channel, COUNT(*) AS new_customers FROM first_orders
+    GROUP BY acquisition_channel ORDER BY new_customers DESC, acquisition_channel LIMIT 1
+
+- id: j10
+  split: test
+  kind: join
+  question: What is the average order value (AOV) for each payment method, to 2 decimals? Return the payment method and its AOV.
+  needs: [metric:aov, rule:order_status, rule:test_accounts]
+  traps: [test, status]
+  gold: |
+    WITH {ITEM_TOTALS}
+    SELECT o.payment_method, SUM(i.items_total - o.discount_amount) * 1.0 / COUNT(*) AS aov
+    {ITEMS_FROM}
+    WHERE {COMPLETED} AND {REAL}
+    GROUP BY o.payment_method
+
+- id: j11
+  split: test
+  kind: join
+  question: >
+    What share of GMV came from electronics? Give it as a fraction between 0 and 1, rounded to 4 decimals.
+  needs: [metric:gmv, rule:test_accounts]
+  traps: [test, status]
+  places: 4
+  gold: |
+    SELECT SUM(CASE WHEN oi.category = 'electronics' THEN oi.quantity * oi.unit_price ELSE 0 END) * 1.0
+           / SUM(oi.quantity * oi.unit_price) AS electronics_share
+    {GMV_FROM}
+    WHERE {REAL} AND {NOT_CANCELLED}
+
+- id: j12
+  split: test
+  kind: join
+  question: What was net revenue in September 2026 for each city? Return the city and its net revenue.
+  needs: [metric:net_revenue, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status, refund]
+  gold: |
+    WITH {ITEM_TOTALS}, {REFUND_TOTALS}
+    SELECT c.city, SUM({NET_VALUE}) AS net_revenue
+    {NET_FROM}
+    WHERE {COMPLETED} AND {REAL} AND {IST_RANGE 2026-09-01 2026-09-30}
+    GROUP BY c.city
+
+- id: j13
+  split: test
+  kind: join
+  question: >
+    On average, how many days pass between a customer's signup date and the date of their first completed order, with both
+    dates taken in IST? Round to 2 decimals.
+  needs: [metric:new_customer, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status]
+  gold: |
+    WITH {FIRST_ORDERS}
+    SELECT AVG(DATEDIFF('day', signup_day, first_day)) AS avg_days FROM first_orders
+
+- id: j14
+  split: test
+  kind: join
+  question: How many customers have a lifetime value of zero?
+  needs: [metric:customer_ltv, rule:test_accounts]
+  traps: [test, status]
+  gold: |
+    WITH {ITEM_TOTALS}, {REFUND_TOTALS},
+    ltv AS (SELECT o.customer_id, SUM({NET_VALUE}) AS ltv {NET_FROM} WHERE {COMPLETED} AND {REAL} GROUP BY o.customer_id)
+    SELECT COUNT(*) AS customers FROM customers c LEFT JOIN ltv ON ltv.customer_id = c.customer_id
+    WHERE {REAL} AND COALESCE(ltv.ltv, 0) = 0
+
+- id: j15
+  split: test
+  kind: join
+  question: How many returned orders have a refund record?
+  needs: [rule:test_accounts]
+  traps: [test]
+  gold: |
+    SELECT COUNT(DISTINCT o.order_id) AS orders
+    {ORDERS_C} JOIN refunds r ON r.order_id = o.order_id
+    WHERE o.status = 'returned' AND {REAL}
+
+- id: j16
+  split: test
+  kind: join
+  question: >
+    What was GMV in each month of 2026? Return the first day of the month as a date and the GMV, ordered by month.
+  needs: [metric:gmv, rule:reporting_timezone, rule:test_accounts]
+  traps: [test, tz, status]
+  ordered: true
+  gold: |
+    SELECT CAST(DATE_TRUNC('month', {IST_DATE}) AS DATE) AS month, SUM(oi.quantity * oi.unit_price) AS gmv
+    {GMV_FROM}
+    WHERE {REAL} AND {NOT_CANCELLED} AND {IST_DATE} >= DATE '2026-01-01'
+    GROUP BY 1 ORDER BY 1
+
+# ======================================================== controls: dev
+# Raw table questions that need no definition. Where a rule would tempt an agent to filter, the question says "no filters",
+# so a rule applied by reflex gives the wrong answer (see `anti`).
+
+- id: c01
+  split: dev
+  kind: control
+  question: How many rows does the orders table contain? Count every row, no filters.
+  anti: |
+    SELECT COUNT(*) FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE {REAL}
+  gold: SELECT COUNT(*) AS n FROM orders
+
+- id: c02
+  split: dev
+  kind: control
+  question: How many distinct city values are there in the customers table?
+  gold: SELECT COUNT(DISTINCT city) AS n FROM customers
+
+- id: c03
+  split: dev
+  kind: control
+  question: What is the highest unit_price in the order_items table?
+  gold: SELECT MAX(unit_price) AS max_price FROM order_items
+
+- id: c04
+  split: dev
+  kind: control
+  question: How many customers are flagged with is_test = true?
+  gold: SELECT COUNT(*) AS n FROM customers WHERE is_test
+
+- id: c05
+  split: dev
+  kind: control
+  question: How many rows does the refunds table contain? Count every row, no filters.
+  anti: |
+    SELECT COUNT(*) FROM refunds r JOIN orders o ON o.order_id = r.order_id JOIN customers c ON c.customer_id = o.customer_id WHERE {REAL}
+  gold: SELECT COUNT(*) AS n FROM refunds
+
+# ======================================================== controls: test
+
+- id: c06
+  split: test
+  kind: control
+  question: How many rows does the customers table contain? Count every row, no filters.
+  anti: SELECT COUNT(*) FROM customers c WHERE {REAL}
+  gold: SELECT COUNT(*) AS n FROM customers
+
+- id: c07
+  split: test
+  kind: control
+  question: What are the distinct values of payment_method in the orders table? Return one value per row.
+  gold: SELECT DISTINCT payment_method FROM orders
+
+- id: c08
+  split: test
+  kind: control
+  question: What is the lowest unit_price in the order_items table?
+  gold: SELECT MIN(unit_price) AS min_price FROM order_items
+
+- id: c09
+  split: test
+  kind: control
+  question: How many rows does the order_items table contain? Count every row, no filters.
+  anti: |
+    SELECT COUNT(*) FROM order_items oi JOIN orders o ON o.order_id = oi.order_id JOIN customers c ON c.customer_id = o.customer_id WHERE {REAL}
+  gold: SELECT COUNT(*) AS n FROM order_items
+
+- id: c10
+  split: test
+  kind: control
+  question: What are the distinct categories in the order_items table? Return one category per row.
+  gold: SELECT DISTINCT category FROM order_items
+
+# ======================================================== unanswerable: dev
+# The data has no column that could answer these. The correct behaviour is to say so and not to invent a proxy.
+
+- id: u01
+  split: dev
+  kind: unanswerable
+  question: What is our profit margin by product category?
+  why: There is no cost, cost of goods or margin data, only selling prices.
+  missing: [cost, margin, profit]
+
+- id: u02
+  split: dev
+  kind: unanswerable
+  question: What is the average delivery time in days?
+  why: Orders have only a placed time and a status, no shipped or delivered timestamp.
+  missing: [delivery, delivered, shipped]
+
+- id: u03
+  split: dev
+  kind: unanswerable
+  question: What share of our customers are women?
+  why: Customers have no gender field.
+  missing: [gender, sex]
+
+- id: u04
+  split: dev
+  kind: unanswerable
+  question: What are the most common reasons customers give for returning an order?
+  why: Returns are recorded as a status and a refund, with no reason.
+  missing: [reason]
+
+- id: u05
+  split: dev
+  kind: unanswerable
+  question: What is our average customer satisfaction score?
+  why: There are no ratings, reviews or survey scores.
+  missing: [satisfaction, rating, review, score]
+
+# ======================================================== unanswerable: test
+
+- id: u06
+  split: test
+  kind: unanswerable
+  question: What is our customer acquisition cost for paid search?
+  why: There is no marketing spend data. Only the acquisition channel of each customer is stored.
+  missing: [spend, cost, budget]
+
+- id: u07
+  split: test
+  kind: unanswerable
+  question: Which individual product (SKU) sold the most units?
+  why: Order items have a category but no product or SKU identifier.
+  missing: [sku, product]
+
+- id: u08
+  split: test
+  kind: unanswerable
+  question: How many of our customers are aged 18 to 25?
+  why: Customers have no age or date of birth.
+  missing: [age, birth, dob]
+
+- id: u09
+  split: test
+  kind: unanswerable
+  question: How many units do we currently have in inventory?
+  why: There is no stock or inventory table.
+  missing: [inventory, stock, warehouse]
+
+- id: u10
+  split: test
+  kind: unanswerable
+  question: What is our website conversion rate from visit to order?
+  why: There is no visit, session or traffic data.
+  missing: [visit, session, traffic, conversion]

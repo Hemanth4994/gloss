@@ -30,6 +30,11 @@ rules:
     definition: >
       When a question says "today", "now", "currently" or "recently", use the as-of date 2026-09-30 (an IST date).
       The data ends on that day.
+  - name: relative_periods
+    definition: >
+      Relative periods are measured in IST dates against the as-of date 2026-09-30. "Last N days" means the N IST dates
+      ending on 2026-09-30, inclusive of both ends, so the last 7 days are 24 to 30 September 2026. "This month" is
+      1 to 30 September 2026. "Last month" is August 2026. "This year" and "year to date" are 1 January to 30 September 2026.
 
 tables:
   customers:
@@ -37,7 +42,7 @@ tables:
     columns:
       customer_id: Primary key.
       signup_at: When the account was created (UTC). Signing up is not the same as buying.
-      city: Customer's city.
+      city: Customer's city. The value Unknown means the source row had no city.
       is_test: True for internal test accounts (see rule test_accounts).
       acquisition_channel: How the customer arrived, one of organic, paid_search, social, referral.
   orders:

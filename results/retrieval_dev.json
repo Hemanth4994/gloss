@@ -1,0 +1,1951 @@
+{
+ "results": {
+  "bm25 k=1": {
+   "avg_words": 48.4,
+   "complete": 0.0,
+   "mean_recall": 0.2708,
+   "metric_recall": 0.625,
+   "per_question": [
+    {
+     "got": [
+      "rule:relative_periods"
+     ],
+     "id": "d01",
+     "missed": [
+      "metric:net_revenue",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:net_revenue",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.0,
+     "words": 64
+    },
+    {
+     "got": [
+      "metric:aov"
+     ],
+     "id": "d02",
+     "missed": [
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:aov",
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 0.3333333333333333,
+     "words": 28
+    },
+    {
+     "got": [
+      "metric:active_customer"
+     ],
+     "id": "d03",
+     "missed": [
+      "rule:as_of_date",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:active_customer",
+      "rule:as_of_date",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.25,
+     "words": 41
+    },
+    {
+     "got": [
+      "metric:new_customer"
+     ],
+     "id": "d04",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:new_customer",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.3333333333333333,
+     "words": 36
+    },
+    {
+     "got": [
+      "rule:relative_periods"
+     ],
+     "id": "d05",
+     "missed": [
+      "metric:cancellation_rate",
+      "rule:order_status"
+     ],
+     "needs": [
+      "metric:cancellation_rate",
+      "rule:relative_periods",
+      "rule:order_status"
+     ],
+     "recall": 0.3333333333333333,
+     "words": 64
+    },
+    {
+     "got": [
+      "rule:relative_periods"
+     ],
+     "id": "d06",
+     "missed": [
+      "metric:gmv",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:gmv",
+      "rule:relative_periods",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.25,
+     "words": 64
+    },
+    {
+     "got": [
+      "rule:relative_periods"
+     ],
+     "id": "d07",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.0,
+     "words": 64
+    },
+    {
+     "got": [
+      "rule:order_status"
+     ],
+     "id": "d08",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 55
+    },
+    {
+     "got": [
+      "metric:repeat_customer"
+     ],
+     "id": "d09",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:repeat_customer",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 15
+    },
+    {
+     "got": [
+      "metric:customer_ltv"
+     ],
+     "id": "d10",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:customer_ltv",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 39
+    },
+    {
+     "got": [
+      "rule:relative_periods"
+     ],
+     "id": "d11",
+     "missed": [
+      "metric:net_revenue",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:net_revenue",
+      "rule:relative_periods",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.25,
+     "words": 64
+    },
+    {
+     "got": [
+      "rule:relative_periods"
+     ],
+     "id": "d12",
+     "missed": [
+      "metric:return_rate",
+      "rule:order_status",
+      "rule:reporting_timezone"
+     ],
+     "needs": [
+      "metric:return_rate",
+      "rule:order_status",
+      "rule:reporting_timezone"
+     ],
+     "recall": 0.0,
+     "words": 64
+    },
+    {
+     "got": [
+      "metric:net_revenue"
+     ],
+     "id": "j01",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:net_revenue",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 73
+    },
+    {
+     "got": [
+      "metric:gmv"
+     ],
+     "id": "j02",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:gmv",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 36
+    },
+    {
+     "got": [
+      "metric:gmv"
+     ],
+     "id": "j03",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:gmv",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.3333333333333333,
+     "words": 36
+    },
+    {
+     "got": [
+      "rule:relative_periods"
+     ],
+     "id": "j04",
+     "missed": [
+      "metric:new_customer",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:new_customer",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.0,
+     "words": 64
+    },
+    {
+     "got": [
+      "metric:cancellation_rate"
+     ],
+     "id": "j05",
+     "missed": [
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:cancellation_rate",
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 0.3333333333333333,
+     "words": 29
+    },
+    {
+     "got": [
+      "table:customers"
+     ],
+     "id": "j06",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "rule:test_accounts"
+     ],
+     "recall": 0.0,
+     "words": 57
+    },
+    {
+     "got": [
+      "table:refunds"
+     ],
+     "id": "j07",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "rule:test_accounts"
+     ],
+     "recall": 0.0,
+     "words": 59
+    },
+    {
+     "got": [
+      "metric:repeat_customer"
+     ],
+     "id": "j08",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:repeat_customer",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 15
+    }
+   ],
+   "questions": 20,
+   "rule_recall": 0.0833
+  },
+  "bm25 k=3": {
+   "avg_words": 128.4,
+   "complete": 0.05,
+   "mean_recall": 0.4542,
+   "metric_recall": 1.0,
+   "per_question": [
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:net_revenue",
+      "metric:customer_ltv"
+     ],
+     "id": "d01",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:net_revenue",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.3333333333333333,
+     "words": 176
+    },
+    {
+     "got": [
+      "metric:aov",
+      "metric:gmv",
+      "metric:customer_ltv"
+     ],
+     "id": "d02",
+     "missed": [
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:aov",
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 0.3333333333333333,
+     "words": 103
+    },
+    {
+     "got": [
+      "metric:active_customer",
+      "rule:as_of_date",
+      "metric:repeat_customer"
+     ],
+     "id": "d03",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:active_customer",
+      "rule:as_of_date",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 79
+    },
+    {
+     "got": [
+      "metric:new_customer",
+      "rule:relative_periods",
+      "rule:as_of_date"
+     ],
+     "id": "d04",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:new_customer",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.3333333333333333,
+     "words": 123
+    },
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:cancellation_rate",
+      "rule:order_status"
+     ],
+     "id": "d05",
+     "missed": [],
+     "needs": [
+      "metric:cancellation_rate",
+      "rule:relative_periods",
+      "rule:order_status"
+     ],
+     "recall": 1.0,
+     "words": 148
+    },
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:gmv",
+      "rule:reporting_timezone"
+     ],
+     "id": "d06",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:gmv",
+      "rule:relative_periods",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.75,
+     "words": 150
+    },
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:return_rate",
+      "rule:as_of_date"
+     ],
+     "id": "d07",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.0,
+     "words": 112
+    },
+    {
+     "got": [
+      "rule:order_status",
+      "metric:cancellation_rate",
+      "metric:return_rate"
+     ],
+     "id": "d08",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 109
+    },
+    {
+     "got": [
+      "metric:repeat_customer",
+      "metric:new_customer",
+      "metric:customer_ltv"
+     ],
+     "id": "d09",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:repeat_customer",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 90
+    },
+    {
+     "got": [
+      "metric:customer_ltv",
+      "metric:aov",
+      "table:customers"
+     ],
+     "id": "d10",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:customer_ltv",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 124
+    },
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:net_revenue",
+      "metric:customer_ltv"
+     ],
+     "id": "d11",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:net_revenue",
+      "rule:relative_periods",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 176
+    },
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:return_rate",
+      "rule:order_status"
+     ],
+     "id": "d12",
+     "missed": [
+      "rule:reporting_timezone"
+     ],
+     "needs": [
+      "metric:return_rate",
+      "rule:order_status",
+      "rule:reporting_timezone"
+     ],
+     "recall": 0.6666666666666666,
+     "words": 144
+    },
+    {
+     "got": [
+      "metric:net_revenue",
+      "metric:customer_ltv",
+      "table:customers"
+     ],
+     "id": "j01",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:net_revenue",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 169
+    },
+    {
+     "got": [
+      "metric:gmv",
+      "table:customers",
+      "metric:return_rate"
+     ],
+     "id": "j02",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:gmv",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 118
+    },
+    {
+     "got": [
+      "metric:gmv",
+      "table:order_items",
+      "rule:relative_periods"
+     ],
+     "id": "j03",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:gmv",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.3333333333333333,
+     "words": 139
+    },
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:new_customer",
+      "rule:reporting_timezone"
+     ],
+     "id": "j04",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:new_customer",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.6666666666666666,
+     "words": 150
+    },
+    {
+     "got": [
+      "metric:cancellation_rate",
+      "rule:order_status",
+      "table:orders"
+     ],
+     "id": "j05",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:cancellation_rate",
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 0.6666666666666666,
+     "words": 132
+    },
+    {
+     "got": [
+      "table:customers",
+      "metric:customer_ltv",
+      "metric:repeat_customer"
+     ],
+     "id": "j06",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "rule:test_accounts"
+     ],
+     "recall": 0.0,
+     "words": 111
+    },
+    {
+     "got": [
+      "table:refunds",
+      "rule:money_units",
+      "metric:aov"
+     ],
+     "id": "j07",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "rule:test_accounts"
+     ],
+     "recall": 0.0,
+     "words": 119
+    },
+    {
+     "got": [
+      "metric:repeat_customer",
+      "table:customers",
+      "metric:return_rate"
+     ],
+     "id": "j08",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:repeat_customer",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 97
+    }
+   ],
+   "questions": 20,
+   "rule_recall": 0.2167
+  },
+  "bm25 k=5": {
+   "avg_words": 212.6,
+   "complete": 0.05,
+   "mean_recall": 0.4708,
+   "metric_recall": 1.0,
+   "per_question": [
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:net_revenue",
+      "metric:customer_ltv",
+      "rule:as_of_date",
+      "rule:order_status"
+     ],
+     "id": "d01",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:net_revenue",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.3333333333333333,
+     "words": 254
+    },
+    {
+     "got": [
+      "metric:aov",
+      "metric:gmv",
+      "metric:customer_ltv",
+      "table:refunds",
+      "table:customers"
+     ],
+     "id": "d02",
+     "missed": [
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:aov",
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 0.3333333333333333,
+     "words": 219
+    },
+    {
+     "got": [
+      "metric:active_customer",
+      "rule:as_of_date",
+      "metric:repeat_customer",
+      "metric:new_customer",
+      "metric:customer_ltv"
+     ],
+     "id": "d03",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:active_customer",
+      "rule:as_of_date",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 154
+    },
+    {
+     "got": [
+      "metric:new_customer",
+      "rule:relative_periods",
+      "rule:as_of_date",
+      "rule:reporting_timezone",
+      "metric:repeat_customer"
+     ],
+     "id": "d04",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:new_customer",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.6666666666666666,
+     "words": 188
+    },
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:cancellation_rate",
+      "rule:order_status",
+      "metric:return_rate",
+      "rule:reporting_timezone"
+     ],
+     "id": "d05",
+     "missed": [],
+     "needs": [
+      "metric:cancellation_rate",
+      "rule:relative_periods",
+      "rule:order_status"
+     ],
+     "recall": 1.0,
+     "words": 223
+    },
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:gmv",
+      "rule:reporting_timezone",
+      "metric:net_revenue"
+     ],
+     "id": "d06",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:gmv",
+      "rule:relative_periods",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.75,
+     "words": 223
+    },
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:return_rate",
+      "rule:as_of_date",
+      "table:orders",
+      "rule:order_status"
+     ],
+     "id": "d07",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.0,
+     "words": 215
+    },
+    {
+     "got": [
+      "rule:order_status",
+      "metric:cancellation_rate",
+      "metric:return_rate",
+      "metric:aov",
+      "metric:gmv"
+     ],
+     "id": "d08",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 173
+    },
+    {
+     "got": [
+      "metric:repeat_customer",
+      "metric:new_customer",
+      "metric:customer_ltv",
+      "metric:active_customer",
+      "table:customers"
+     ],
+     "id": "d09",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:repeat_customer",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 188
+    },
+    {
+     "got": [
+      "metric:customer_ltv",
+      "metric:aov",
+      "table:customers",
+      "metric:return_rate",
+      "table:refunds"
+     ],
+     "id": "d10",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:customer_ltv",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 208
+    },
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:net_revenue",
+      "metric:customer_ltv",
+      "metric:active_customer",
+      "metric:repeat_customer"
+     ],
+     "id": "d11",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:net_revenue",
+      "rule:relative_periods",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 232
+    },
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:return_rate",
+      "rule:order_status",
+      "metric:cancellation_rate",
+      "rule:as_of_date"
+     ],
+     "id": "d12",
+     "missed": [
+      "rule:reporting_timezone"
+     ],
+     "needs": [
+      "metric:return_rate",
+      "rule:order_status",
+      "rule:reporting_timezone"
+     ],
+     "recall": 0.6666666666666666,
+     "words": 196
+    },
+    {
+     "got": [
+      "metric:net_revenue",
+      "metric:customer_ltv",
+      "table:customers",
+      "rule:order_status",
+      "metric:return_rate"
+     ],
+     "id": "j01",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:net_revenue",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 249
+    },
+    {
+     "got": [
+      "metric:gmv",
+      "table:customers",
+      "metric:return_rate",
+      "metric:net_revenue",
+      "rule:order_status"
+     ],
+     "id": "j02",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:gmv",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 246
+    },
+    {
+     "got": [
+      "metric:gmv",
+      "table:order_items",
+      "rule:relative_periods",
+      "metric:return_rate",
+      "rule:as_of_date"
+     ],
+     "id": "j03",
+     "missed": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:gmv",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.3333333333333333,
+     "words": 187
+    },
+    {
+     "got": [
+      "rule:relative_periods",
+      "metric:new_customer",
+      "rule:reporting_timezone",
+      "metric:net_revenue",
+      "rule:as_of_date"
+     ],
+     "id": "j04",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:new_customer",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.6666666666666666,
+     "words": 246
+    },
+    {
+     "got": [
+      "metric:cancellation_rate",
+      "rule:order_status",
+      "table:orders",
+      "metric:return_rate",
+      "rule:relative_periods"
+     ],
+     "id": "j05",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:cancellation_rate",
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 0.6666666666666666,
+     "words": 221
+    },
+    {
+     "got": [
+      "table:customers",
+      "metric:customer_ltv",
+      "metric:repeat_customer",
+      "metric:active_customer",
+      "metric:new_customer"
+     ],
+     "id": "j06",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "rule:test_accounts"
+     ],
+     "recall": 0.0,
+     "words": 188
+    },
+    {
+     "got": [
+      "table:refunds",
+      "rule:money_units",
+      "metric:aov",
+      "metric:net_revenue",
+      "table:orders"
+     ],
+     "id": "j07",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "rule:test_accounts"
+     ],
+     "recall": 0.0,
+     "words": 240
+    },
+    {
+     "got": [
+      "metric:repeat_customer",
+      "table:customers",
+      "metric:return_rate",
+      "rule:order_status",
+      "rule:reporting_timezone"
+     ],
+     "id": "j08",
+     "missed": [
+      "rule:test_accounts"
+     ],
+     "needs": [
+      "metric:repeat_customer",
+      "rule:test_accounts"
+     ],
+     "recall": 0.5,
+     "words": 202
+    }
+   ],
+   "questions": 20,
+   "rule_recall": 0.2417
+  },
+  "rules+bm25 k=1": {
+   "avg_words": 269.2,
+   "complete": 0.7,
+   "mean_recall": 0.9083,
+   "metric_recall": 0.625,
+   "per_question": [
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods"
+     ],
+     "id": "d01",
+     "missed": [
+      "metric:net_revenue"
+     ],
+     "needs": [
+      "metric:net_revenue",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.6666666666666666,
+     "words": 246
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:aov"
+     ],
+     "id": "d02",
+     "missed": [],
+     "needs": [
+      "metric:aov",
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 274
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:active_customer"
+     ],
+     "id": "d03",
+     "missed": [],
+     "needs": [
+      "metric:active_customer",
+      "rule:as_of_date",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 287
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:new_customer"
+     ],
+     "id": "d04",
+     "missed": [],
+     "needs": [
+      "metric:new_customer",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 282
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods"
+     ],
+     "id": "d05",
+     "missed": [
+      "metric:cancellation_rate"
+     ],
+     "needs": [
+      "metric:cancellation_rate",
+      "rule:relative_periods",
+      "rule:order_status"
+     ],
+     "recall": 0.6666666666666666,
+     "words": 246
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods"
+     ],
+     "id": "d06",
+     "missed": [
+      "metric:gmv"
+     ],
+     "needs": [
+      "metric:gmv",
+      "rule:relative_periods",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.75,
+     "words": 246
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods"
+     ],
+     "id": "d07",
+     "missed": [],
+     "needs": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 246
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods"
+     ],
+     "id": "d08",
+     "missed": [],
+     "needs": [
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 246
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:repeat_customer"
+     ],
+     "id": "d09",
+     "missed": [],
+     "needs": [
+      "metric:repeat_customer",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 261
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:customer_ltv"
+     ],
+     "id": "d10",
+     "missed": [],
+     "needs": [
+      "metric:customer_ltv",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 285
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods"
+     ],
+     "id": "d11",
+     "missed": [
+      "metric:net_revenue"
+     ],
+     "needs": [
+      "metric:net_revenue",
+      "rule:relative_periods",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.75,
+     "words": 246
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods"
+     ],
+     "id": "d12",
+     "missed": [
+      "metric:return_rate"
+     ],
+     "needs": [
+      "metric:return_rate",
+      "rule:order_status",
+      "rule:reporting_timezone"
+     ],
+     "recall": 0.6666666666666666,
+     "words": 246
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:net_revenue"
+     ],
+     "id": "j01",
+     "missed": [],
+     "needs": [
+      "metric:net_revenue",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 319
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:gmv"
+     ],
+     "id": "j02",
+     "missed": [],
+     "needs": [
+      "metric:gmv",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 282
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:gmv"
+     ],
+     "id": "j03",
+     "missed": [],
+     "needs": [
+      "metric:gmv",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 282
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods"
+     ],
+     "id": "j04",
+     "missed": [
+      "metric:new_customer"
+     ],
+     "needs": [
+      "metric:new_customer",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 0.6666666666666666,
+     "words": 246
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:cancellation_rate"
+     ],
+     "id": "j05",
+     "missed": [],
+     "needs": [
+      "metric:cancellation_rate",
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 275
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "table:customers"
+     ],
+     "id": "j06",
+     "missed": [],
+     "needs": [
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 303
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "table:refunds"
+     ],
+     "id": "j07",
+     "missed": [],
+     "needs": [
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 305
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:repeat_customer"
+     ],
+     "id": "j08",
+     "missed": [],
+     "needs": [
+      "metric:repeat_customer",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 261
+    }
+   ],
+   "questions": 20,
+   "rule_recall": 1.0
+  },
+  "rules+bm25 k=3": {
+   "avg_words": 324.6,
+   "complete": 1.0,
+   "mean_recall": 1.0,
+   "metric_recall": 1.0,
+   "per_question": [
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:net_revenue",
+      "metric:customer_ltv"
+     ],
+     "id": "d01",
+     "missed": [],
+     "needs": [
+      "metric:net_revenue",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 358
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:aov",
+      "metric:gmv",
+      "metric:customer_ltv"
+     ],
+     "id": "d02",
+     "missed": [],
+     "needs": [
+      "metric:aov",
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 349
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:active_customer",
+      "metric:repeat_customer"
+     ],
+     "id": "d03",
+     "missed": [],
+     "needs": [
+      "metric:active_customer",
+      "rule:as_of_date",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 302
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:new_customer"
+     ],
+     "id": "d04",
+     "missed": [],
+     "needs": [
+      "metric:new_customer",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 282
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:cancellation_rate"
+     ],
+     "id": "d05",
+     "missed": [],
+     "needs": [
+      "metric:cancellation_rate",
+      "rule:relative_periods",
+      "rule:order_status"
+     ],
+     "recall": 1.0,
+     "words": 275
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:gmv"
+     ],
+     "id": "d06",
+     "missed": [],
+     "needs": [
+      "metric:gmv",
+      "rule:relative_periods",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 282
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:return_rate"
+     ],
+     "id": "d07",
+     "missed": [],
+     "needs": [
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 271
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:cancellation_rate",
+      "metric:return_rate"
+     ],
+     "id": "d08",
+     "missed": [],
+     "needs": [
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 300
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:repeat_customer",
+      "metric:new_customer",
+      "metric:customer_ltv"
+     ],
+     "id": "d09",
+     "missed": [],
+     "needs": [
+      "metric:repeat_customer",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 336
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:customer_ltv",
+      "metric:aov",
+      "table:customers"
+     ],
+     "id": "d10",
+     "missed": [],
+     "needs": [
+      "metric:customer_ltv",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 370
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:net_revenue",
+      "metric:customer_ltv"
+     ],
+     "id": "d11",
+     "missed": [],
+     "needs": [
+      "metric:net_revenue",
+      "rule:relative_periods",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 358
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:return_rate"
+     ],
+     "id": "d12",
+     "missed": [],
+     "needs": [
+      "metric:return_rate",
+      "rule:order_status",
+      "rule:reporting_timezone"
+     ],
+     "recall": 1.0,
+     "words": 271
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:net_revenue",
+      "metric:customer_ltv",
+      "table:customers"
+     ],
+     "id": "j01",
+     "missed": [],
+     "needs": [
+      "metric:net_revenue",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 415
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:gmv",
+      "table:customers",
+      "metric:return_rate"
+     ],
+     "id": "j02",
+     "missed": [],
+     "needs": [
+      "metric:gmv",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 364
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:gmv",
+      "table:order_items"
+     ],
+     "id": "j03",
+     "missed": [],
+     "needs": [
+      "metric:gmv",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 321
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:new_customer"
+     ],
+     "id": "j04",
+     "missed": [],
+     "needs": [
+      "metric:new_customer",
+      "rule:reporting_timezone",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 282
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:cancellation_rate",
+      "table:orders"
+     ],
+     "id": "j05",
+     "missed": [],
+     "needs": [
+      "metric:cancellation_rate",
+      "rule:order_status",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 323
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "table:customers",
+      "metric:customer_ltv",
+      "metric:repeat_customer"
+     ],
+     "id": "j06",
+     "missed": [],
+     "needs": [
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 357
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "table:refunds",
+      "metric:aov"
+     ],
+     "id": "j07",
+     "missed": [],
+     "needs": [
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 333
+    },
+    {
+     "got": [
+      "rule:reporting_timezone",
+      "rule:test_accounts",
+      "rule:order_status",
+      "rule:money_units",
+      "rule:as_of_date",
+      "rule:relative_periods",
+      "metric:repeat_customer",
+      "table:customers",
+      "metric:return_rate"
+     ],
+     "id": "j08",
+     "missed": [],
+     "needs": [
+      "metric:repeat_customer",
+      "rule:test_accounts"
+     ],
+     "recall": 1.0,
+     "words": 343
+    }
+   ],
+   "questions": 20,
+   "rule_recall": 1.0
+  }
+ },
+ "retriever": {
+  "b": 0.75,
+  "k1": 1.5,
+  "type": "bm25"
+ },
+ "split": "dev"
+}

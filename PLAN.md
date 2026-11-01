@@ -18,7 +18,7 @@ written by me, so the test is "does the agent use supplied definitions correctly
 
 ## Parts
 
-1. **Warehouse.** A small synthetic e-commerce warehouse in DuckDB (orders, order_items, customers, payments, refunds),
+1. **Warehouse.** A small synthetic e-commerce warehouse in DuckDB (customers, orders, order_items, refunds; the payment method is a column on orders),
    generated with a fixed seed, with realistic traps planted on purpose: cancelled and returned orders, test accounts,
    timestamps stored in UTC but reported in IST, refunds in a separate table. A data-quality report logs rows the loader rejects.
 2. **Data dictionary.** YAML: table and column descriptions plus metric definitions ("net revenue", "active customer",
@@ -57,6 +57,13 @@ written by me, so the test is "does the agent use supplied definitions correctly
 | Wed 4 Nov | Test runs (two configurations), failure analysis |
 | Thu 5 Nov | Deploy to Hugging Face Spaces, README results |
 | Fri 6 Nov | Resume bullets, LinkedIn post, demo recording |
+
+## Progress
+
+- Done ahead of schedule (Sun 1 Nov): data generator and loader, data dictionary, MCP server over stdio and HTTP, BM25, the 60 questions
+  with gold SQL, the scorer, and the retrieval check on the dev split.
+- Retrieval choice, made on dev only: all rule chunks plus the BM25 top 3. Plain BM25 gave every needed chunk for 5% of dev questions.
+- Next: the LangGraph agent and LangSmith tracing (Mon 2 Nov), then dev runs and tuning, then the freeze tag before any test run.
 
 ## Not doing
 

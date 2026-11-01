@@ -1,0 +1,819 @@
+{
+ "answers": {
+  "c01": {
+   "columns": [
+    "n"
+   ],
+   "question": "How many rows does the orders table contain? Count every row, no filters.",
+   "rows": [
+    [
+     5740
+    ]
+   ],
+   "sql": "SELECT COUNT(*) AS n FROM orders"
+  },
+  "c02": {
+   "columns": [
+    "n"
+   ],
+   "question": "How many distinct city values are there in the customers table?",
+   "rows": [
+    [
+     11
+    ]
+   ],
+   "sql": "SELECT COUNT(DISTINCT city) AS n FROM customers"
+  },
+  "c03": {
+   "columns": [
+    "max_price"
+   ],
+   "question": "What is the highest unit_price in the order_items table?",
+   "rows": [
+    [
+     5998
+    ]
+   ],
+   "sql": "SELECT MAX(unit_price) AS max_price FROM order_items"
+  },
+  "c04": {
+   "columns": [
+    "n"
+   ],
+   "question": "How many customers are flagged with is_test = true?",
+   "rows": [
+    [
+     71
+    ]
+   ],
+   "sql": "SELECT COUNT(*) AS n FROM customers WHERE is_test"
+  },
+  "c05": {
+   "columns": [
+    "n"
+   ],
+   "question": "How many rows does the refunds table contain? Count every row, no filters.",
+   "rows": [
+    [
+     546
+    ]
+   ],
+   "sql": "SELECT COUNT(*) AS n FROM refunds"
+  },
+  "c06": {
+   "columns": [
+    "n"
+   ],
+   "question": "How many rows does the customers table contain? Count every row, no filters.",
+   "rows": [
+    [
+     2500
+    ]
+   ],
+   "sql": "SELECT COUNT(*) AS n FROM customers"
+  },
+  "c07": {
+   "columns": [
+    "payment_method"
+   ],
+   "question": "What are the distinct values of payment_method in the orders table? Return one value per row.",
+   "rows": [
+    [
+     "upi"
+    ],
+    [
+     "cod"
+    ],
+    [
+     "card"
+    ]
+   ],
+   "sql": "SELECT DISTINCT payment_method FROM orders"
+  },
+  "c08": {
+   "columns": [
+    "min_price"
+   ],
+   "question": "What is the lowest unit_price in the order_items table?",
+   "rows": [
+    [
+     20
+    ]
+   ],
+   "sql": "SELECT MIN(unit_price) AS min_price FROM order_items"
+  },
+  "c09": {
+   "columns": [
+    "n"
+   ],
+   "question": "How many rows does the order_items table contain? Count every row, no filters.",
+   "rows": [
+    [
+     10978
+    ]
+   ],
+   "sql": "SELECT COUNT(*) AS n FROM order_items"
+  },
+  "c10": {
+   "columns": [
+    "category"
+   ],
+   "question": "What are the distinct categories in the order_items table? Return one category per row.",
+   "rows": [
+    [
+     "personal_care"
+    ],
+    [
+     "electronics"
+    ],
+    [
+     "snacks"
+    ],
+    [
+     "home"
+    ],
+    [
+     "grocery"
+    ],
+    [
+     "beverages"
+    ]
+   ],
+   "sql": "SELECT DISTINCT category FROM order_items"
+  },
+  "d01": {
+   "columns": [
+    "net_revenue"
+   ],
+   "question": "What was net revenue in August 2026?",
+   "rows": [
+    [
+     2175470
+    ]
+   ],
+   "sql": "WITH item_totals AS (SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id), refund_totals AS (SELECT order_id, SUM(refund_amount) AS refunded FROM refunds GROUP BY order_id) SELECT SUM((i.items_total - o.discount_amount - COALESCE(r.refunded, 0))) AS net_revenue FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN item_totals i ON i.order_id = o.order_id LEFT JOIN refund_totals r ON r.order_id = o.order_id WHERE o.status = 'completed' AND NOT c.is_test AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-08-01' AND DATE '2026-08-31'"
+  },
+  "d02": {
+   "columns": [
+    "aov"
+   ],
+   "question": "What is our average order value (AOV), to 2 decimals?",
+   "rows": [
+    [
+     2368.072805139186
+    ]
+   ],
+   "sql": "WITH item_totals AS (SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id) SELECT SUM(i.items_total - o.discount_amount) * 1.0 / COUNT(*) AS aov FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN item_totals i ON i.order_id = o.order_id WHERE o.status = 'completed' AND NOT c.is_test"
+  },
+  "d03": {
+   "columns": [
+    "active_customers"
+   ],
+   "question": "How many active customers do we have today?",
+   "rows": [
+    [
+     1235
+    ]
+   ],
+   "sql": "SELECT COUNT(DISTINCT o.customer_id) AS active_customers FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.status = 'completed' AND NOT c.is_test AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-07-03' AND DATE '2026-09-30'"
+  },
+  "d04": {
+   "columns": [
+    "new_customers"
+   ],
+   "question": "How many new customers did we get in July 2026?",
+   "rows": [
+    [
+     238
+    ]
+   ],
+   "sql": "WITH first_orders AS (SELECT o.customer_id, c.acquisition_channel, CAST(c.signup_at + INTERVAL 330 MINUTE AS DATE) AS signup_day, MIN(CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE)) AS first_day FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.status = 'completed' AND NOT c.is_test GROUP BY o.customer_id, c.acquisition_channel, c.signup_at) SELECT COUNT(*) AS new_customers FROM first_orders WHERE first_day BETWEEN DATE '2026-07-01' AND DATE '2026-07-31'"
+  },
+  "d05": {
+   "columns": [
+    "cancellation_rate"
+   ],
+   "question": "What is the cancellation rate for this year so far? Give it as a fraction between 0 and 1, rounded to 4 decimals.",
+   "rows": [
+    [
+     0.07614310311842357
+    ]
+   ],
+   "sql": "SELECT SUM(CASE WHEN o.status = 'cancelled' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS cancellation_rate FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND o.status IN ('completed', 'cancelled', 'returned') AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-01-01' AND DATE '2026-09-30'"
+  },
+  "d06": {
+   "columns": [
+    "gmv"
+   ],
+   "question": "What was GMV last month?",
+   "rows": [
+    [
+     2515258
+    ]
+   ],
+   "sql": "SELECT SUM(oi.quantity * oi.unit_price) AS gmv FROM order_items oi JOIN orders o ON o.order_id = oi.order_id JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND o.status <> 'cancelled' AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-08-01' AND DATE '2026-08-31'"
+  },
+  "d07": {
+   "columns": [
+    "orders"
+   ],
+   "question": "How many orders were placed on 15 August 2026?",
+   "rows": [
+    [
+     25
+    ]
+   ],
+   "sql": "SELECT COUNT(*) AS orders FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-08-15' AND DATE '2026-08-15'"
+  },
+  "d08": {
+   "columns": [
+    "pending_orders"
+   ],
+   "question": "How many orders are still pending?",
+   "rows": [
+    [
+     130
+    ]
+   ],
+   "sql": "SELECT COUNT(*) AS pending_orders FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND o.status = 'pending'"
+  },
+  "d09": {
+   "columns": [
+    "repeat_customers"
+   ],
+   "question": "How many repeat customers do we have?",
+   "rows": [
+    [
+     1060
+    ]
+   ],
+   "sql": "SELECT COUNT(*) AS repeat_customers FROM ( SELECT o.customer_id FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.status = 'completed' AND NOT c.is_test GROUP BY o.customer_id HAVING COUNT(*) >= 2 )"
+  },
+  "d10": {
+   "columns": [
+    "customer_id",
+    "ltv"
+   ],
+   "question": "Who are our top 5 customers by lifetime value? Return the customer id and the value.",
+   "rows": [
+    [
+     1408,
+     87929
+    ],
+    [
+     1502,
+     59430
+    ],
+    [
+     2103,
+     47843
+    ],
+    [
+     1417,
+     44893
+    ],
+    [
+     25,
+     42903
+    ]
+   ],
+   "sql": "WITH item_totals AS (SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id), refund_totals AS (SELECT order_id, SUM(refund_amount) AS refunded FROM refunds GROUP BY order_id), ltv AS (SELECT o.customer_id, SUM((i.items_total - o.discount_amount - COALESCE(r.refunded, 0))) AS ltv FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN item_totals i ON i.order_id = o.order_id LEFT JOIN refund_totals r ON r.order_id = o.order_id WHERE o.status = 'completed' AND NOT c.is_test GROUP BY o.customer_id) SELECT customer_id, ltv FROM ltv ORDER BY ltv DESC, customer_id LIMIT 5"
+  },
+  "d11": {
+   "columns": [
+    "net_revenue"
+   ],
+   "question": "What was net revenue over the last 7 days?",
+   "rows": [
+    [
+     262071
+    ]
+   ],
+   "sql": "WITH item_totals AS (SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id), refund_totals AS (SELECT order_id, SUM(refund_amount) AS refunded FROM refunds GROUP BY order_id) SELECT SUM((i.items_total - o.discount_amount - COALESCE(r.refunded, 0))) AS net_revenue FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN item_totals i ON i.order_id = o.order_id LEFT JOIN refund_totals r ON r.order_id = o.order_id WHERE o.status = 'completed' AND NOT c.is_test AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-09-24' AND DATE '2026-09-30'"
+  },
+  "d12": {
+   "columns": [
+    "return_rate"
+   ],
+   "question": "What was the return rate in August 2026? Give it as a fraction between 0 and 1, rounded to 4 decimals.",
+   "rows": [
+    [
+     0.07048872180451128
+    ]
+   ],
+   "sql": "SELECT SUM(CASE WHEN o.status = 'returned' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS return_rate FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND o.status IN ('completed', 'returned') AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-08-01' AND DATE '2026-08-31'"
+  },
+  "j01": {
+   "columns": [
+    "city",
+    "net_revenue"
+   ],
+   "question": "Which city had the highest net revenue? Return the city and its net revenue.",
+   "rows": [
+    [
+     "Bengaluru",
+     1267593
+    ]
+   ],
+   "sql": "WITH item_totals AS (SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id), refund_totals AS (SELECT order_id, SUM(refund_amount) AS refunded FROM refunds GROUP BY order_id) SELECT c.city, SUM((i.items_total - o.discount_amount - COALESCE(r.refunded, 0))) AS net_revenue FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN item_totals i ON i.order_id = o.order_id LEFT JOIN refund_totals r ON r.order_id = o.order_id WHERE o.status = 'completed' AND NOT c.is_test GROUP BY c.city ORDER BY net_revenue DESC, c.city LIMIT 1"
+  },
+  "j02": {
+   "columns": [
+    "acquisition_channel",
+    "gmv"
+   ],
+   "question": "What is GMV for each acquisition channel? Return the channel and its GMV.",
+   "rows": [
+    [
+     "organic",
+     6141891
+    ],
+    [
+     "social",
+     2217149
+    ],
+    [
+     "referral",
+     1457178
+    ],
+    [
+     "paid_search",
+     3207858
+    ]
+   ],
+   "sql": "SELECT c.acquisition_channel, SUM(oi.quantity * oi.unit_price) AS gmv FROM order_items oi JOIN orders o ON o.order_id = oi.order_id JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND o.status <> 'cancelled' GROUP BY c.acquisition_channel"
+  },
+  "j03": {
+   "columns": [
+    "category",
+    "gmv"
+   ],
+   "question": "What was GMV for each product category in July 2026? Return the category and its GMV.",
+   "rows": [
+    [
+     "electronics",
+     1403837
+    ],
+    [
+     "personal_care",
+     144830
+    ],
+    [
+     "home",
+     322331
+    ],
+    [
+     "beverages",
+     59024
+    ],
+    [
+     "snacks",
+     43690
+    ],
+    [
+     "grocery",
+     94708
+    ]
+   ],
+   "sql": "SELECT oi.category, SUM(oi.quantity * oi.unit_price) AS gmv FROM order_items oi JOIN orders o ON o.order_id = oi.order_id JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND o.status <> 'cancelled' AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-07-01' AND DATE '2026-07-31' GROUP BY oi.category"
+  },
+  "j04": {
+   "columns": [
+    "month",
+    "new_customers"
+   ],
+   "question": "How many new customers did we get in each month of 2026? Return the first day of the month as a date and the count, ordered by month.",
+   "rows": [
+    [
+     "2026-01-01",
+     79
+    ],
+    [
+     "2026-02-01",
+     109
+    ],
+    [
+     "2026-03-01",
+     141
+    ],
+    [
+     "2026-04-01",
+     157
+    ],
+    [
+     "2026-05-01",
+     182
+    ],
+    [
+     "2026-06-01",
+     228
+    ],
+    [
+     "2026-07-01",
+     238
+    ],
+    [
+     "2026-08-01",
+     274
+    ],
+    [
+     "2026-09-01",
+     147
+    ]
+   ],
+   "sql": "WITH first_orders AS (SELECT o.customer_id, c.acquisition_channel, CAST(c.signup_at + INTERVAL 330 MINUTE AS DATE) AS signup_day, MIN(CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE)) AS first_day FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.status = 'completed' AND NOT c.is_test GROUP BY o.customer_id, c.acquisition_channel, c.signup_at) SELECT CAST(DATE_TRUNC('month', first_day) AS DATE) AS month, COUNT(*) AS new_customers FROM first_orders WHERE first_day >= DATE '2026-01-01' GROUP BY 1 ORDER BY 1"
+  },
+  "j05": {
+   "columns": [
+    "cancellation_rate"
+   ],
+   "question": "What is the cancellation rate for cash-on-delivery orders? Give it as a fraction between 0 and 1, rounded to 4 decimals.",
+   "rows": [
+    [
+     0.07099143206854346
+    ]
+   ],
+   "sql": "SELECT SUM(CASE WHEN o.status = 'cancelled' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS cancellation_rate FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND o.payment_method = 'cod' AND o.status IN ('completed', 'cancelled', 'returned')"
+  },
+  "j06": {
+   "columns": [
+    "customers"
+   ],
+   "question": "How many customers have never had a completed order?",
+   "rows": [
+    [
+     734
+    ]
+   ],
+   "sql": "SELECT COUNT(*) AS customers FROM customers c WHERE NOT c.is_test AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id AND o.status = 'completed')"
+  },
+  "j07": {
+   "columns": [
+    "refunded"
+   ],
+   "question": "What is the total amount refunded on completed orders?",
+   "rows": [
+    [
+     95152
+    ]
+   ],
+   "sql": "SELECT SUM(r.refund_amount) AS refunded FROM refunds r JOIN orders o ON o.order_id = r.order_id JOIN customers c ON c.customer_id = o.customer_id WHERE o.status = 'completed' AND NOT c.is_test"
+  },
+  "j08": {
+   "columns": [
+    "city",
+    "repeat_customers"
+   ],
+   "question": "Which 3 cities have the most repeat customers? Return the city and the number of repeat customers.",
+   "rows": [
+    [
+     "Delhi",
+     119
+    ],
+    [
+     "Bengaluru",
+     117
+    ],
+    [
+     "Ahmedabad",
+     114
+    ]
+   ],
+   "sql": "WITH per AS (SELECT o.customer_id, c.city, COUNT(*) AS n FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.status = 'completed' AND NOT c.is_test GROUP BY o.customer_id, c.city HAVING COUNT(*) >= 2) SELECT city, COUNT(*) AS repeat_customers FROM per GROUP BY city ORDER BY repeat_customers DESC, city LIMIT 3"
+  },
+  "j09": {
+   "columns": [
+    "acquisition_channel",
+    "new_customers"
+   ],
+   "question": "Which acquisition channel brought in the most new customers? Return the channel and the count.",
+   "rows": [
+    [
+     "organic",
+     800
+    ]
+   ],
+   "sql": "WITH first_orders AS (SELECT o.customer_id, c.acquisition_channel, CAST(c.signup_at + INTERVAL 330 MINUTE AS DATE) AS signup_day, MIN(CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE)) AS first_day FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.status = 'completed' AND NOT c.is_test GROUP BY o.customer_id, c.acquisition_channel, c.signup_at) SELECT acquisition_channel, COUNT(*) AS new_customers FROM first_orders GROUP BY acquisition_channel ORDER BY new_customers DESC, acquisition_channel LIMIT 1"
+  },
+  "j10": {
+   "columns": [
+    "payment_method",
+    "aov"
+   ],
+   "question": "What is the average order value (AOV) for each payment method, to 2 decimals? Return the payment method and its AOV.",
+   "rows": [
+    [
+     "upi",
+     2372.392031305585
+    ],
+    [
+     "card",
+     2445.5384615384614
+    ],
+    [
+     "cod",
+     2227.146853146853
+    ]
+   ],
+   "sql": "WITH item_totals AS (SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id) SELECT o.payment_method, SUM(i.items_total - o.discount_amount) * 1.0 / COUNT(*) AS aov FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN item_totals i ON i.order_id = o.order_id WHERE o.status = 'completed' AND NOT c.is_test GROUP BY o.payment_method"
+  },
+  "j11": {
+   "columns": [
+    "electronics_share"
+   ],
+   "question": "What share of GMV came from electronics? Give it as a fraction between 0 and 1, rounded to 4 decimals.",
+   "rows": [
+    [
+     0.654119724117089
+    ]
+   ],
+   "sql": "SELECT SUM(CASE WHEN oi.category = 'electronics' THEN oi.quantity * oi.unit_price ELSE 0 END) * 1.0 / SUM(oi.quantity * oi.unit_price) AS electronics_share FROM order_items oi JOIN orders o ON o.order_id = oi.order_id JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND o.status <> 'cancelled'"
+  },
+  "j12": {
+   "columns": [
+    "city",
+    "net_revenue"
+   ],
+   "question": "What was net revenue in September 2026 for each city? Return the city and its net revenue.",
+   "rows": [
+    [
+     "Ahmedabad",
+     210211
+    ],
+    [
+     "Mumbai",
+     174765
+    ],
+    [
+     "Delhi",
+     195426
+    ],
+    [
+     "Unknown",
+     23352
+    ],
+    [
+     "Jaipur",
+     231400
+    ],
+    [
+     "Hyderabad",
+     143077
+    ],
+    [
+     "Kolkata",
+     219941
+    ],
+    [
+     "Pune",
+     212188
+    ],
+    [
+     "Bengaluru",
+     228170
+    ],
+    [
+     "Chennai",
+     207854
+    ],
+    [
+     "Kochi",
+     184728
+    ]
+   ],
+   "sql": "WITH item_totals AS (SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id), refund_totals AS (SELECT order_id, SUM(refund_amount) AS refunded FROM refunds GROUP BY order_id) SELECT c.city, SUM((i.items_total - o.discount_amount - COALESCE(r.refunded, 0))) AS net_revenue FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN item_totals i ON i.order_id = o.order_id LEFT JOIN refund_totals r ON r.order_id = o.order_id WHERE o.status = 'completed' AND NOT c.is_test AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-09-01' AND DATE '2026-09-30' GROUP BY c.city"
+  },
+  "j13": {
+   "columns": [
+    "avg_days"
+   ],
+   "question": "On average, how many days pass between a customer's signup date and the date of their first completed order, with both dates taken in IST? Round to 2 decimals.",
+   "rows": [
+    [
+     66.34985250737464
+    ]
+   ],
+   "sql": "WITH first_orders AS (SELECT o.customer_id, c.acquisition_channel, CAST(c.signup_at + INTERVAL 330 MINUTE AS DATE) AS signup_day, MIN(CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE)) AS first_day FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.status = 'completed' AND NOT c.is_test GROUP BY o.customer_id, c.acquisition_channel, c.signup_at) SELECT AVG(DATEDIFF('day', signup_day, first_day)) AS avg_days FROM first_orders"
+  },
+  "j14": {
+   "columns": [
+    "customers"
+   ],
+   "question": "How many customers have a lifetime value of zero?",
+   "rows": [
+    [
+     734
+    ]
+   ],
+   "sql": "WITH item_totals AS (SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id), refund_totals AS (SELECT order_id, SUM(refund_amount) AS refunded FROM refunds GROUP BY order_id), ltv AS (SELECT o.customer_id, SUM((i.items_total - o.discount_amount - COALESCE(r.refunded, 0))) AS ltv FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN item_totals i ON i.order_id = o.order_id LEFT JOIN refund_totals r ON r.order_id = o.order_id WHERE o.status = 'completed' AND NOT c.is_test GROUP BY o.customer_id) SELECT COUNT(*) AS customers FROM customers c LEFT JOIN ltv ON ltv.customer_id = c.customer_id WHERE NOT c.is_test AND COALESCE(ltv.ltv, 0) = 0"
+  },
+  "j15": {
+   "columns": [
+    "orders"
+   ],
+   "question": "How many returned orders have a refund record?",
+   "rows": [
+    [
+     338
+    ]
+   ],
+   "sql": "SELECT COUNT(DISTINCT o.order_id) AS orders FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN refunds r ON r.order_id = o.order_id WHERE o.status = 'returned' AND NOT c.is_test"
+  },
+  "j16": {
+   "columns": [
+    "month",
+    "gmv"
+   ],
+   "question": "What was GMV in each month of 2026? Return the first day of the month as a date and the GMV, ordered by month.",
+   "rows": [
+    [
+     "2026-01-01",
+     386473
+    ],
+    [
+     "2026-02-01",
+     463005
+    ],
+    [
+     "2026-03-01",
+     913048
+    ],
+    [
+     "2026-04-01",
+     892611
+    ],
+    [
+     "2026-05-01",
+     1109097
+    ],
+    [
+     "2026-06-01",
+     1603509
+    ],
+    [
+     "2026-07-01",
+     2068420
+    ],
+    [
+     "2026-08-01",
+     2515258
+    ],
+    [
+     "2026-09-01",
+     2669021
+    ]
+   ],
+   "sql": "SELECT CAST(DATE_TRUNC('month', CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE)) AS DATE) AS month, SUM(oi.quantity * oi.unit_price) AS gmv FROM order_items oi JOIN orders o ON o.order_id = oi.order_id JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND o.status <> 'cancelled' AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) >= DATE '2026-01-01' GROUP BY 1 ORDER BY 1"
+  },
+  "t01": {
+   "columns": [
+    "net_revenue"
+   ],
+   "question": "What was net revenue in March 2026?",
+   "rows": [
+    [
+     780279
+    ]
+   ],
+   "sql": "WITH item_totals AS (SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id), refund_totals AS (SELECT order_id, SUM(refund_amount) AS refunded FROM refunds GROUP BY order_id) SELECT SUM((i.items_total - o.discount_amount - COALESCE(r.refunded, 0))) AS net_revenue FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN item_totals i ON i.order_id = o.order_id LEFT JOIN refund_totals r ON r.order_id = o.order_id WHERE o.status = 'completed' AND NOT c.is_test AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-03-01' AND DATE '2026-03-31'"
+  },
+  "t02": {
+   "columns": [
+    "aov"
+   ],
+   "question": "What is the average order value (AOV) for card payments, to 2 decimals?",
+   "rows": [
+    [
+     2445.5384615384614
+    ]
+   ],
+   "sql": "WITH item_totals AS (SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id) SELECT SUM(i.items_total - o.discount_amount) * 1.0 / COUNT(*) AS aov FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN item_totals i ON i.order_id = o.order_id WHERE o.status = 'completed' AND NOT c.is_test AND o.payment_method = 'card'"
+  },
+  "t03": {
+   "columns": [
+    "customers"
+   ],
+   "question": "How many customers placed a completed order in the last 30 days?",
+   "rows": [
+    [
+     591
+    ]
+   ],
+   "sql": "SELECT COUNT(DISTINCT o.customer_id) AS customers FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.status = 'completed' AND NOT c.is_test AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-09-01' AND DATE '2026-09-30'"
+  },
+  "t04": {
+   "columns": [
+    "new_customers"
+   ],
+   "question": "How many new customers did we get last month?",
+   "rows": [
+    [
+     274
+    ]
+   ],
+   "sql": "WITH first_orders AS (SELECT o.customer_id, c.acquisition_channel, CAST(c.signup_at + INTERVAL 330 MINUTE AS DATE) AS signup_day, MIN(CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE)) AS first_day FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.status = 'completed' AND NOT c.is_test GROUP BY o.customer_id, c.acquisition_channel, c.signup_at) SELECT COUNT(*) AS new_customers FROM first_orders WHERE first_day BETWEEN DATE '2026-08-01' AND DATE '2026-08-31'"
+  },
+  "t05": {
+   "columns": [
+    "return_rate"
+   ],
+   "question": "What was the return rate over the last 90 days? Give it as a fraction between 0 and 1, rounded to 4 decimals.",
+   "rows": [
+    [
+     0.07103825136612021
+    ]
+   ],
+   "sql": "SELECT SUM(CASE WHEN o.status = 'returned' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS return_rate FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND o.status IN ('completed', 'returned') AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-07-03' AND DATE '2026-09-30'"
+  },
+  "t06": {
+   "columns": [
+    "cancellation_rate"
+   ],
+   "question": "What is the cancellation rate this month? Give it as a fraction between 0 and 1, rounded to 4 decimals.",
+   "rows": [
+    [
+     0.08062930186823992
+    ]
+   ],
+   "sql": "SELECT SUM(CASE WHEN o.status = 'cancelled' THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS cancellation_rate FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND o.status IN ('completed', 'cancelled', 'returned') AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-09-01' AND DATE '2026-09-30'"
+  },
+  "t07": {
+   "columns": [
+    "orders"
+   ],
+   "question": "How many orders were placed on 9 February 2026?",
+   "rows": [
+    [
+     12
+    ]
+   ],
+   "sql": "SELECT COUNT(*) AS orders FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-02-09' AND DATE '2026-02-09'"
+  },
+  "t08": {
+   "columns": [
+    "orders"
+   ],
+   "question": "How many orders with status completed were placed in May 2026?",
+   "rows": [
+    [
+     433
+    ]
+   ],
+   "sql": "SELECT COUNT(*) AS orders FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.status = 'completed' AND NOT c.is_test AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-05-01' AND DATE '2026-05-31'"
+  },
+  "t09": {
+   "columns": [
+    "gmv"
+   ],
+   "question": "What was GMV over the last 60 days?",
+   "rows": [
+    [
+     5124616
+    ]
+   ],
+   "sql": "SELECT SUM(oi.quantity * oi.unit_price) AS gmv FROM order_items oi JOIN orders o ON o.order_id = oi.order_id JOIN customers c ON c.customer_id = o.customer_id WHERE NOT c.is_test AND o.status <> 'cancelled' AND CAST(o.ordered_at + INTERVAL 330 MINUTE AS DATE) BETWEEN DATE '2026-08-02' AND DATE '2026-09-30'"
+  },
+  "t10": {
+   "columns": [
+    "ltv"
+   ],
+   "question": "What is the lifetime value of customer 2296?",
+   "rows": [
+    [
+     3607
+    ]
+   ],
+   "sql": "WITH item_totals AS (SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id), refund_totals AS (SELECT order_id, SUM(refund_amount) AS refunded FROM refunds GROUP BY order_id) SELECT SUM((i.items_total - o.discount_amount - COALESCE(r.refunded, 0))) AS ltv FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN item_totals i ON i.order_id = o.order_id LEFT JOIN refund_totals r ON r.order_id = o.order_id WHERE o.status = 'completed' AND NOT c.is_test AND o.customer_id = 2296"
+  },
+  "t11": {
+   "columns": [
+    "customers"
+   ],
+   "question": "How many customers have a lifetime value above 15000 rupees?",
+   "rows": [
+    [
+     210
+    ]
+   ],
+   "sql": "WITH item_totals AS (SELECT order_id, SUM(quantity * unit_price) AS items_total FROM order_items GROUP BY order_id), refund_totals AS (SELECT order_id, SUM(refund_amount) AS refunded FROM refunds GROUP BY order_id), ltv AS (SELECT o.customer_id, SUM((i.items_total - o.discount_amount - COALESCE(r.refunded, 0))) AS ltv FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN item_totals i ON i.order_id = o.order_id LEFT JOIN refund_totals r ON r.order_id = o.order_id WHERE o.status = 'completed' AND NOT c.is_test GROUP BY o.customer_id) SELECT COUNT(*) AS customers FROM ltv WHERE ltv > 15000"
+  },
+  "t12": {
+   "columns": [
+    "repeat_share"
+   ],
+   "question": "Of the customers with at least one completed order, what fraction are repeat customers? Give it as a fraction between 0 and 1, rounded to 4 decimals.",
+   "rows": [
+    [
+     0.6253687315634219
+    ]
+   ],
+   "sql": "WITH per AS (SELECT o.customer_id, COUNT(*) AS n FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.status = 'completed' AND NOT c.is_test GROUP BY o.customer_id) SELECT SUM(CASE WHEN n >= 2 THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS repeat_share FROM per"
+  }
+ },
+ "warehouse_rows": {
+  "customers": 2500,
+  "order_items": 10978,
+  "orders": 5740,
+  "refunds": 546
+ }
+}
