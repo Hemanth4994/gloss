@@ -85,8 +85,12 @@ class TestRunner(unittest.TestCase):
             with self.assertRaises(SystemExit) as no_final:
                 self.run_main("--split", "test", "--config", "none", "--db", db, "--out", out)
             self.assertIn("frozen", str(no_final.exception))
-            with self.assertRaises(SystemExit) as no_tag:
-                self.run_main("--split", "test", "--config", "none", "--db", db, "--out", out, "--final")
+            real_tag, run_eval.TAG = run_eval.TAG, "frozen-tag-that-does-not-exist"     # the real tag exists in the repo by now
+            try:
+                with self.assertRaises(SystemExit) as no_tag:
+                    self.run_main("--split", "test", "--config", "none", "--db", db, "--out", out, "--final")
+            finally:
+                run_eval.TAG = real_tag
             self.assertIn("freeze", str(no_tag.exception).lower())
             self.assertFalse(os.path.exists(out))                      # nothing was run or written
 

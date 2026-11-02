@@ -3,7 +3,7 @@
 Ask your data, grounded in your definitions. An open-source MCP server and a LangGraph agent for a data warehouse, with a
 measured evaluation of when the agent is right, wrong, or should refuse.
 
-**Status: data, definitions, MCP server, evaluation set, agent and evaluation runner are built. The agent has been run on the 30 development questions with a real model (results below). The 30 test questions have not been run yet.** See [PLAN.md](PLAN.md).
+**Status: data, definitions, MCP server, evaluation set, agent and evaluation runner are built, and the frozen test split has been run once in each of three configurations (results below). Not done yet: the public deployment.** See [PLAN.md](PLAN.md).
 
 ## What exists
 
@@ -44,32 +44,68 @@ What this says: plain BM25 finds the metric a question names ("net revenue", "re
 
 Caveats. Rule recall of 1.0 for the "all rules" rows is by construction, since every rule is always shown; it says nothing about whether the agent then applies them, which is what the agent evaluation measures. The questions and the dictionary were written by the same author, so this measures use of supplied definitions, not discovery of conventions. The test split has not been used for any choice.
 
-## Development runs (first runs, before any change)
+## Test results (frozen)
 
-Model: `gemini-3.5-flash-lite` on the free tier (the id the API reported for every call). One run per configuration on the 30 development questions, one model call per question, nothing tuned between the runs. Raw records: `results/dev_definitions.jsonl` and `results/dev_none.jsonl`, with `.summary.json` next to each.
+The 30 test questions were run once per configuration on the code tagged `frozen-v1` (commit `ccd36bf`: prompt, retrieval, questions and gold answers fixed before any test run). Model: `gemini-3.5-flash-lite` on the free tier, the id the API reported for every call. Raw records and summaries: `results/test_<config>.jsonl` and `.summary.json`. Intervals are 95% Wilson intervals from `results/failure_analysis.json`.
 
-| 30 dev questions | `definitions` | `none` |
-|---|---|---|
-| Definition questions | 12 / 12 | 0 / 12 |
-| Join questions | 6 / 8 | 0 / 8 |
-| Raw-table controls | 5 / 5 | 5 / 5 |
-| Unanswerable (must refuse) | 5 / 5 | 5 / 5 |
-| **Overall** | **28 / 30** | **10 / 30** |
-| Wrong answers / refusals of answerable questions | 2 / 0 | 17 / 3 |
-| Tokens in / out (30 calls) | 27,104 / 5,374 | 9,699 / 3,276 |
-
-How to read this. The questions were written to need the definitions (IST dates, test accounts, order status, "last month"), so the gap shows that the agent uses supplied definitions correctly. It does not show how accurate the agent would be on a warehouse whose conventions it has to discover. `none` gives the model only table, column and type names, with no descriptions and no sample values, so it is a floor, not a competitor; the three refusals there are the model saying it cannot know what "active customer", "return rate" or the status values mean. That is why a third configuration, `tables` (full table and column descriptions, no rules or metrics), was added after seeing these results and before the test split was run. Both unanswerable-question scores are 5 / 5 in both configurations, so definitions neither helped nor hurt refusal on these five.
-
-The two failures with definitions, both real agent errors (the gold answers are checked against an independent Python calculation):
-
-| id | what the agent did | agent answer vs gold | category |
+| 30 test questions | `definitions` | `tables` | `none` |
 |---|---|---|---|
-| j01 | Joined `order_items` straight to `orders` and subtracted the order-level discount once per item row | Delhi 1,100,817 vs Bengaluru 1,267,593 | wrong join grain (fan-out) |
-| j08 | Applied "two or more orders" to each city group instead of to each customer, so it counted customers with a single completed order | 193 / 177 / 175 vs 119 / 117 / 114 | wrong aggregation level |
+| Definition questions (12) | 10 | 1 | 0 |
+| Join questions (8) | 7 | 0 | 0 |
+| Raw-table controls (5) | 5 | 5 | 5 |
+| Unanswerable, must refuse (5) | 5 | 5 | 5 |
+| **Overall** | **27 / 30 (90.0%)** | **11 / 30 (36.7%)** | **10 / 30 (33.3%)** |
+| 95% interval | 74.4% to 96.5% | 21.9% to 54.5% | 19.2% to 51.2% |
+| Wrong answers / refusals of answerable questions | 3 / 0 | 16 / 3 | 20 / 0 |
+| Model calls (30 questions) | 30 | 30 | 32 |
+| Tokens in / out | 27,420 / 5,566 | 20,737 / 3,749 | 10,876 / 4,677 |
 
-Both come from the same weakness: not aggregating to the right grain before combining tables. The system prompt was left unchanged, because adding a hint for these two cases would make the development score meaningless as an estimate.
+What the configurations show the model:
+- `definitions`: every rule plus the BM25 top 3 chunks for the question (rules, metric definitions, table descriptions).
+- `tables`: the description of every table and column, no rules and no metrics.
+- `none`: only table names, column names and types.
 
-Caveats. Each number is one sample: this model ignores the `temperature` setting, so a repeat run can differ. The questions and the dictionary have the same author. Mean time per question was about 4.4 s, which includes the request spacing the throttle adds to stay under the free-tier rate limit, so it is not a model-speed measurement.
+What this says.
+1. The definitions are what make the difference. With them the agent got 27 of 30; without them 10 or 11, and the intervals do not overlap. The same ordering held on the development split.
+2. Documentation of tables and columns alone did not help (11 vs 10 on test, 10 vs 10 on dev). The model still did not know what "net revenue", "new customer" or "last month" mean here. It became more cautious instead: `tables` refused 3 answerable questions on test and 7 on dev, saying the term was not defined, where `none` mostly guessed.
+3. Refusing what the data cannot answer worked in every configuration (5 of 5 each time), so definitions neither helped nor hurt refusal on these five questions. That says little about harder or subtler cases.
+4. Controls (raw table questions where no rule should be applied) were 5 of 5 everywhere, so supplying rules did not make the agent apply them where they do not belong.
+
+## Failure analysis
+
+Every wrong answer on the test split is tagged, and so are the wrong answers of both development runs with definitions. The table is `results/failure_analysis.md`, built by `analysis/classify_failures.py`. For each wrong answer it first checks mechanically whether the agent's result equals the gold query with some of the question's traps (test accounts, IST dates, order status, refunds) switched off. Everything else was tagged by hand after reading the SQL (`analysis/manual_tags.yaml`).
+
+With definitions, all 3 test failures and all 4 development failures (two runs) are the same kind of error: not combining tables at the right grain. Four repeat an order-level amount once per item row after joining `order_items` (for example the discount subtracted for every item), and three apply a condition or a MAX at the wrong level (per city instead of per customer, MAX instead of SUM across a customer's orders). In every one of the seven the agent cited the right definitions and applied the test-account, IST and status rules correctly; what failed was the SQL. The prompt was deliberately not changed in response, because that would turn the development split into training data.
+
+| Wrong answers on the test split | `definitions` | `tables` | `none` |
+|---|---|---|---|
+| Equal to the gold query with test accounts / IST dates / status ignored | 0 | 8 | 8 |
+| Relative period from the system clock, not the as-of date | 0 | 4 | 3 |
+| "New customer" taken from signup, not first purchase | 0 | 2 | 2 |
+| Metric defined differently (statuses, discounts, refunds, GMV after discount, fractional days) | 0 | 1 | 4 |
+| Order-level amount repeated per item row (fan-out) | 2 | 1 | 2 |
+| Condition or MAX at the wrong level | 1 | 0 | 0 |
+| Returns approximated with the refunds table | 0 | 0 | 1 |
+| **Total wrong answers** | **3** | **16** | **20** |
+
+The clock failures are worth a sentence: asked about "the last 30 days", the baselines used `NOW()`, which is after the end of the data, and sometimes returned 0 or NULL. A warehouse with a fixed as-of date needs that written down, which is what the `relative_periods` rule does.
+
+Development split, for reference (each one run, `results/dev_*.jsonl`): `definitions` 28 / 30 twice, but not the same questions: j01 failed both times, j08 only in the first run and d10 only in the second. `tables` 10 / 30, `none` 10 / 30. The dev wrong answers of `none` and `tables` were not tagged by hand (14 of them are unexplained in `results/failure_analysis.md`).
+
+## Limits of this evidence
+
+- 30 test questions per configuration. A score of 27 / 30 is compatible with a true rate anywhere from about 74% to 97%, and one question can flip between runs: this model ignores the `temperature` setting, so each number is one sample, not a fixed result.
+- I wrote the questions, the gold SQL and the dictionary. The agent is scored on using supplied definitions correctly, not on discovering a company's conventions, and the questions were written to depend on them. The wide gap between configurations is partly by design.
+- The unanswerable and control sets have 5 questions each per split, too few to say much beyond "no failures seen".
+- The `tables` configuration was added after seeing the development results (because `none` is only a bare schema), and before any test run. No prompt, retrieval or question was changed after the development runs.
+- The synthetic data is small (2,500 customers, about 5,700 orders). Nothing here says how the agent behaves on a real, messy warehouse.
+- Run headers record SHA-256 prefixes of `eval/questions.yaml` and `eval/gold_answers.json`; they were computed on a Windows checkout with CRLF line endings, so they equal the hashes of the committed files with CRLF and differ from a hash taken on Linux. The files themselves are the tagged ones.
+- After the test runs, one change was made under the frozen folders: `tests/test_run_eval.py` now points the freeze check at a tag name that does not exist, because the real `frozen-v1` tag made that test fail once the tag existed. It touches no result and no code that produced one; `git diff frozen-v1 HEAD -- src eval scripts` is empty.
+- Time per question is not reported: the request spacing the throttle adds to stay under the free-tier rate limit dominates it.
+
+## Development runs (before the freeze)
+
+Same model, one run each on the 30 development questions, nothing tuned between them: `definitions` 28 / 30 (run 1: definition 12/12, join 6/8; run 2: definition 11/12, join 7/8; control and unanswerable 5/5 and 5/5 both times), `none` 10 / 30 (wrong 17, refused 3), `tables` 10 / 30 (wrong 13, refused 7). Raw records: `results/dev_*.jsonl`.
 
 ## Sources used when planning
 

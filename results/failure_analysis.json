@@ -1,0 +1,114 @@
+{
+ "dev_definitions": {
+  "accuracy": 0.9333,
+  "accuracy_wilson95": [
+   0.787,
+   0.982
+  ],
+  "correct": 28,
+  "false_refusal": 0,
+  "n": 30,
+  "no_result": 0,
+  "should_have_refused": 0,
+  "wrong_answer": 2,
+  "wrong_explained_by_missing_definitions": 0,
+  "wrong_tagged_by_hand": 2,
+  "wrong_untagged": 0
+ },
+ "dev_definitions_run2": {
+  "accuracy": 0.9333,
+  "accuracy_wilson95": [
+   0.787,
+   0.982
+  ],
+  "correct": 28,
+  "false_refusal": 0,
+  "n": 30,
+  "no_result": 0,
+  "should_have_refused": 0,
+  "wrong_answer": 2,
+  "wrong_explained_by_missing_definitions": 0,
+  "wrong_tagged_by_hand": 2,
+  "wrong_untagged": 0
+ },
+ "dev_none": {
+  "accuracy": 0.3333,
+  "accuracy_wilson95": [
+   0.192,
+   0.512
+  ],
+  "correct": 10,
+  "false_refusal": 3,
+  "n": 30,
+  "no_result": 0,
+  "should_have_refused": 0,
+  "wrong_answer": 17,
+  "wrong_explained_by_missing_definitions": 8,
+  "wrong_tagged_by_hand": 0,
+  "wrong_untagged": 9
+ },
+ "dev_tables": {
+  "accuracy": 0.3333,
+  "accuracy_wilson95": [
+   0.192,
+   0.512
+  ],
+  "correct": 10,
+  "false_refusal": 7,
+  "n": 30,
+  "no_result": 0,
+  "should_have_refused": 0,
+  "wrong_answer": 13,
+  "wrong_explained_by_missing_definitions": 8,
+  "wrong_tagged_by_hand": 0,
+  "wrong_untagged": 5
+ },
+ "test_definitions": {
+  "accuracy": 0.9,
+  "accuracy_wilson95": [
+   0.744,
+   0.965
+  ],
+  "correct": 27,
+  "false_refusal": 0,
+  "n": 30,
+  "no_result": 0,
+  "should_have_refused": 0,
+  "wrong_answer": 3,
+  "wrong_explained_by_missing_definitions": 0,
+  "wrong_tagged_by_hand": 3,
+  "wrong_untagged": 0
+ },
+ "test_none": {
+  "accuracy": 0.3333,
+  "accuracy_wilson95": [
+   0.192,
+   0.512
+  ],
+  "correct": 10,
+  "false_refusal": 0,
+  "n": 30,
+  "no_result": 0,
+  "should_have_refused": 0,
+  "wrong_answer": 20,
+  "wrong_explained_by_missing_definitions": 8,
+  "wrong_tagged_by_hand": 12,
+  "wrong_untagged": 0
+ },
+ "test_tables": {
+  "accuracy": 0.3667,
+  "accuracy_wilson95": [
+   0.219,
+   0.545
+  ],
+  "correct": 11,
+  "false_refusal": 3,
+  "n": 30,
+  "no_result": 0,
+  "should_have_refused": 0,
+  "wrong_answer": 16,
+  "wrong_explained_by_missing_definitions": 8,
+  "wrong_tagged_by_hand": 8,
+  "wrong_untagged": 0
+ }
+}

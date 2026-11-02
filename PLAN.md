@@ -67,7 +67,8 @@ written by me, so the test is "does the agent use supplied definitions correctly
   Never run against a real model yet.
 - Dev runs done (Mon 2 Nov): `definitions` 28 / 30, `none` 10 / 30, results in `results/`. Two failures, both wrong grain in a join; nothing changed in response.
 - Added a third configuration, `tables` (table and column descriptions only), so the comparison has a fairer baseline than the bare schema. Added before the freeze.
-- Next: tag `frozen-v1`, then run the test split once per configuration (`definitions`, `tables`, `none`), tag every wrong answer, write the failure analysis.
+- Froze at commit `ccd36bf` (tag `frozen-v1`) and ran the test split once per configuration (Mon 2 Nov): `definitions` 27 / 30, `tables` 11 / 30, `none` 10 / 30. Every wrong answer on the test split is tagged (`results/failure_analysis.md`).
+- Next: deploy to Hugging Face Spaces (one container: Gradio page plus the MCP endpoint, in a folder outside the frozen `src/`, `eval/`, `scripts/`, `tests/`), then resume bullets, LinkedIn post and demo.
 
 ## Not doing
 

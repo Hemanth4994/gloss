@@ -1,0 +1,48 @@
+# Hand tags for wrong answers the mechanical check could not explain, written after reading each agent SQL against the gold SQL.
+# Format: run name (results/<run>.jsonl) -> question id -> {category, note}.
+#
+# Categories
+#   fan-out                     an order-level amount (discount, refund) repeated once per order_items row
+#   wrong aggregation level     a condition or MAX/SUM applied at the wrong level (per city instead of per customer, MAX instead of SUM)
+#   clock instead of as-of date a relative period taken from NOW(), current_date or the latest timestamp, not the as-of date 2026-09-30
+#   new customer from signup    first purchase replaced by signup date, or every customer counted
+#   metric defined differently  the metric computed some other way than the definition (statuses, discounts, refunds, units)
+#   returns from refunds        return rate approximated with the refunds table
+# The configurations without definitions (none, tables) are expected to fail like this; the point of tagging them is to see how.
+
+test_definitions:
+  t01: {category: fan-out, note: "The order-level discount and refund were subtracted once per item row. The IST dates, test filter and status rule were all applied correctly."}
+  t11: {category: wrong aggregation level, note: "MAX(discount) and MAX(refund) across a customer's orders instead of their sum, so lifetime value was overstated and 216 customers passed 15000 instead of 210."}
+  j12: {category: fan-out, note: "The discount was subtracted once per item row (the refund was aggregated to the order first, correctly). Rules were otherwise applied correctly."}
+
+dev_definitions:
+  j01: {category: fan-out, note: "order_items joined straight to orders, so the order-level discount was subtracted once per item row; Delhi instead of Bengaluru."}
+  j08: {category: wrong aggregation level, note: "HAVING two orders applied to each city group, not to each customer, so customers with one completed order were counted."}
+
+dev_definitions_run2:
+  d10: {category: wrong aggregation level, note: "MAX(discount) across a customer's orders instead of their sum, and refunds joined to item rows; values overstated, same five customers."}
+  j01: {category: fan-out, note: "Same error as the first dev run: SUM(discount) over joined item rows."}
+
+test_tables:
+  t03: {category: clock instead of as-of date, note: "current_timestamp minus 30 days; the real date is after the end of the data, so the answer was 0."}
+  t04: {category: new customer from signup, note: "Counted signups in the previous calendar month by the system clock; returned 0."}
+  t05: {category: clock instead of as-of date, note: "current_timestamp minus 90 days over all statuses."}
+  t06: {category: clock instead of as-of date, note: "date_trunc of the current month by the system clock; no rows, so NULL."}
+  t09: {category: clock instead of as-of date, note: "NOW() minus 60 days."}
+  j09: {category: new customer from signup, note: "Counted customers per channel (test accounts excluded) instead of customers by first completed order."}
+  j11: {category: metric defined differently, note: "GMV taken after discounts and only for completed and returned orders; GMV is before discounts and excludes only cancelled orders."}
+  j12: {category: fan-out, note: "Discount and refund repeated per item row; also no test exclusion, no completed-only rule and UTC dates."}
+
+test_none:
+  t01: {category: fan-out, note: "Discount and refund repeated per item row; also no completed-only rule, no test exclusion, UTC dates."}
+  t03: {category: clock instead of as-of date, note: "30 days back from the latest order timestamp in UTC."}
+  t04: {category: new customer from signup, note: "Signups in the previous calendar month by the system clock; returned 0."}
+  t05: {category: returns from refunds, note: "Return rate computed as distinct refunded orders over orders, with the latest-timestamp window."}
+  t06: {category: clock instead of as-of date, note: "Current month by the system clock; no rows, so NULL."}
+  t09: {category: clock instead of as-of date, note: "NOW() minus 60 days."}
+  t10: {category: metric defined differently, note: "All non-cancelled orders, refunds subtracted, discount ignored; lifetime value counts completed orders only and subtracts discounts."}
+  t11: {category: metric defined differently, note: "All non-cancelled orders, no refunds, test accounts included, and the discount repeated per item row."}
+  j09: {category: new customer from signup, note: "Customers per channel, test accounts included."}
+  j12: {category: fan-out, note: "Discount and refund repeated per item row; no test exclusion, no completed-only rule, UTC dates."}
+  j13: {category: metric defined differently, note: "Difference of IST timestamps in fractional days instead of calendar dates, no test exclusion."}
+  j14: {category: metric defined differently, note: "Spend over non-cancelled orders with no refunds or discounts, test accounts included."}
