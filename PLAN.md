@@ -65,7 +65,9 @@ written by me, so the test is "does the agent use supplied definitions correctly
 - Retrieval choice, made on dev only: all rule chunks plus the BM25 top 3. Plain BM25 gave every needed chunk for 5% of dev questions.
 - Agent (`agent.py`), request throttle and evaluation runner (`scripts/run_eval.py`) written and tested with a scripted fake model.
   Never run against a real model yet.
-- Next: a one-question smoke test with a real key, dev runs in both configurations, fixes made on dev only, then the freeze tag before any test run.
+- Dev runs done (Mon 2 Nov): `definitions` 28 / 30, `none` 10 / 30, results in `results/`. Two failures, both wrong grain in a join; nothing changed in response.
+- Added a third configuration, `tables` (table and column descriptions only), so the comparison has a fairer baseline than the bare schema. Added before the freeze.
+- Next: tag `frozen-v1`, then run the test split once per configuration (`definitions`, `tables`, `none`), tag every wrong answer, write the failure analysis.
 
 ## Not doing
 

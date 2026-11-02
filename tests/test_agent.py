@@ -8,7 +8,7 @@ try:
 except ImportError:
     raise unittest.SkipTest("langgraph is not installed")
 
-from gloss.agent import (MAX_REPAIRS, SYSTEM_PROMPT, Plan, PlanResult, build_agent, build_messages, render_answer, run_question,
+from gloss.agent import (CONFIGS, MAX_REPAIRS, SYSTEM_PROMPT, Plan, PlanResult, build_agent, build_messages, render_answer, run_question,
                          schema_text, to_prediction)
 from gloss.dictionary import chunks
 from gloss.evaluation import expand, load_questions, results_match, run_gold, score, summarise
@@ -86,6 +86,23 @@ class TestPromptsAndRetrieval(AgentCase):
         self.assertEqual(final["retrieved"], [])
         self.assertNotIn("Definitions:", script.prompts[0][1][1])
         self.assertNotIn("test_accounts", script.prompts[0][1][1])
+
+    def test_tables_config_shows_every_table_description_and_no_rule_or_metric(self):
+        script = Script(ok("SELECT 1"))
+        final = self.run_with(script, "What was net revenue in August 2026?", config="tables")
+        self.assertEqual(final["retrieved"], [c.id for c in chunks() if c.kind == "table"])
+        shown = script.prompts[0][1][1]
+        self.assertIn("[table:orders]", shown)
+        self.assertIn("[table:refunds]", shown)
+        self.assertNotIn("[rule:", shown)
+        self.assertNotIn("[metric:", shown)
+        self.assertNotIn("Net revenue.", shown)            # the metric definition text is not smuggled in
+
+    def test_the_three_configs_share_one_system_prompt(self):
+        scripts = {c: Script(ok("SELECT 1")) for c in CONFIGS}
+        for c, s in scripts.items():
+            self.run_with(s, config=c)
+        self.assertEqual({tuple(s.prompts[0][0]) for s in scripts.values()}, {("system", SYSTEM_PROMPT)})
 
     def test_the_two_configs_differ_only_in_the_definitions_block(self):
         a, b = Script(ok("SELECT 1")), Script(ok("SELECT 1"))
@@ -182,7 +199,7 @@ class TestEndToEndScoring(AgentCase):
 
     def test_oracle_scores_everything_through_the_graph(self):
         con, tables = self.wh.con, self.wh.tables
-        for config in ("definitions", "none"):
+        for config in CONFIGS:
             agent = build_agent(self.wh, self.oracle)
             outcomes = {}
             for q in QS:

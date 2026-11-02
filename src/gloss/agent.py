@@ -5,10 +5,11 @@
                   |        +--(error, budget left)--> plan   (repair, at most MAX_REPAIRS times)
                   +--(model says the data cannot answer it)--> refused
 
-Two configurations differ ONLY in what retrieve puts in front of the model:
+Three configurations differ ONLY in what retrieve puts in front of the model:
     definitions   every rule chunk plus the BM25 top 3 chunks for the question (the setting chosen on the dev split)
+    tables        the description of every table and column, but no rule and no metric (what plain data documentation gives you)
     none          nothing but the bare schema (table names, column names and types)
-The system prompt below is identical in both and says nothing about the business rules, so the comparison is fair.
+The system prompt below is identical in all three and says nothing about the business rules, so the comparison is fair.
 
 The model is called at most 1 + MAX_REPAIRS times per question. The model is injected as a plain function, so the whole graph
 is tested with a scripted fake model and no API key.
@@ -28,7 +29,7 @@ from .evaluation import Prediction
 from .tools import Warehouse, run_sql, search_definitions
 from .warehouse import GuardError, QueryError, QueryTimeout
 
-CONFIGS = ("definitions", "none")
+CONFIGS = ("definitions", "tables", "none")
 TOP_K = 3                      # frozen on the dev split, see scripts/eval_retrieval.py
 MAX_REPAIRS = 2
 DEFAULT_MODEL = "gemini-3.5-flash-lite"
@@ -131,6 +132,7 @@ def build_agent(wh: Warehouse, planner: Planner, max_repairs: int = MAX_REPAIRS,
     all_chunks = chunks()
     text_of = {c.id: c.text for c in all_chunks}
     rule_ids = [c.id for c in all_chunks if c.kind == "rule"]
+    table_ids = [c.id for c in all_chunks if c.kind == "table"]
     schema = schema_text(wh)
 
     def retrieve(state: State) -> State:
@@ -139,6 +141,8 @@ def build_agent(wh: Warehouse, planner: Planner, max_repairs: int = MAX_REPAIRS,
         ids: list[str] = []
         if state["config"] == "definitions":
             ids = rule_ids + [h["id"] for h in search_definitions(wh, state["question"], top_k) if h["id"] not in rule_ids]
+        elif state["config"] == "tables":
+            ids = table_ids
         return {"retrieved": ids, "context": "\n".join(f"[{i}] {text_of[i]}" for i in ids), "attempts": 0,
                 "input_tokens": 0, "output_tokens": 0, "models": [], "last_error": "", "sql": "", "result": None,
                 "plan": None, "status": "", "refusal_reason": "", "answer": "", "steps": [{"node": "retrieve", "ids": ids}]}
