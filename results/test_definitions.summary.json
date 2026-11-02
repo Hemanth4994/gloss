@@ -1,0 +1,58 @@
+{
+ "answerable_accuracy": {
+  "correct": 22,
+  "n": 25,
+  "rate": 0.88
+ },
+ "by_kind": {
+  "control": {
+   "correct": 5,
+   "n": 5,
+   "rate": 1.0
+  },
+  "definition": {
+   "correct": 10,
+   "n": 12,
+   "rate": 0.8333
+  },
+  "join": {
+   "correct": 7,
+   "n": 8,
+   "rate": 0.875
+  },
+  "unanswerable": {
+   "correct": 5,
+   "n": 5,
+   "rate": 1.0
+  }
+ },
+ "cost": {
+  "input_tokens_total": 27420,
+  "latency_s_mean": 4.38,
+  "model_calls_mean": 1.0,
+  "model_calls_total": 30,
+  "output_tokens_total": 5566
+ },
+ "false_refusal_rate": 0.0,
+ "models_seen": [
+  "gemini-3.5-flash-lite"
+ ],
+ "outcome_counts": {
+  "correct": 22,
+  "correct_refusal": 5,
+  "false_refusal": 0,
+  "no_result": 0,
+  "should_have_refused": 0,
+  "wrong_answer": 3
+ },
+ "overall": {
+  "correct": 27,
+  "n": 30,
+  "rate": 0.9
+ },
+ "refusal_correctness": {
+  "correct": 5,
+  "n": 5,
+  "rate": 1.0
+ }
+}
