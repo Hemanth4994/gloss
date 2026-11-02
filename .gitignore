@@ -5,3 +5,4 @@ __pycache__/
 *.egg-info/
 data/*.duckdb
 data/*.csv
+data/quality_report.json
