@@ -234,7 +234,9 @@ def gemini_planner(model: str | None = None, throttle=None) -> Planner:
     from langchain_google_genai import ChatGoogleGenerativeAI
 
     model = model or os.environ.get("GLOSS_MODEL", DEFAULT_MODEL)
-    llm = ChatGoogleGenerativeAI(model=model, temperature=0).with_structured_output(Plan, include_raw=True)
+    # No temperature argument: gemini-3.5-flash-lite ignores it ("fixed sampling defaults"), so passing 0 only printed a warning on
+    # every call and suggested the runs were deterministic. They are not, so a single run is one sample, not an exact result.
+    llm = ChatGoogleGenerativeAI(model=model).with_structured_output(Plan, include_raw=True)
 
     def planner(messages: list[tuple[str, str]]) -> PlanResult:
         out = throttle.call(lambda: llm.invoke(messages)) if throttle else llm.invoke(messages)
