@@ -1,0 +1,50 @@
+{
+ "test": [
+  {
+   "config": "definitions",
+   "n": 30,
+   "correct": 27,
+   "wilson95": [
+    0.7438,
+    0.9654
+   ],
+   "by_kind": {
+    "definition": "10 / 12",
+    "join": "7 / 8",
+    "control": "5 / 5",
+    "unanswerable": "5 / 5"
+   }
+  },
+  {
+   "config": "tables",
+   "n": 30,
+   "correct": 11,
+   "wilson95": [
+    0.2187,
+    0.5449
+   ],
+   "by_kind": {
+    "definition": "1 / 12",
+    "join": "0 / 8",
+    "control": "5 / 5",
+    "unanswerable": "5 / 5"
+   }
+  },
+  {
+   "config": "none",
+   "n": 30,
+   "correct": 10,
+   "wilson95": [
+    0.1923,
+    0.5122
+   ],
+   "by_kind": {
+    "definition": "0 / 12",
+    "join": "0 / 8",
+    "control": "5 / 5",
+    "unanswerable": "5 / 5"
+   }
+  }
+ ],
+ "note": "The questions, the gold SQL and the definitions were all written by the same author, and the questions were written to depend on the definitions, so the gap shows that the agent uses supplied definitions correctly, not that it can discover a company's conventions. 30 questions per configuration is a small sample, and this model ignores the temperature setting, so each number is one run. The data is synthetic."
+}
