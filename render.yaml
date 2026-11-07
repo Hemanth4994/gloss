@@ -1,0 +1,16 @@
+# Render Blueprint: deploys the same container as space/Dockerfile on Render's free web service (no card needed).
+# The free instance sleeps after 15 minutes without traffic and wakes in about a minute on the next request.
+# GOOGLE_API_KEY is deliberately not listed: add it in the Render dashboard only if you want the shared daily budget.
+services:
+  - type: web
+    name: gloss
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./space/Dockerfile
+    dockerContext: ./space
+    healthCheckPath: /
+    autoDeploy: false
+    envVars:
+      - key: GLOSS_DAILY_CAP
+        value: "25"
