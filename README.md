@@ -30,6 +30,18 @@ PYTHONPATH=src python -m gloss.mcp_server --db data/gloss.duckdb              # 
 PYTHONPATH=src python -m gloss.mcp_server --db data/gloss.duckdb --http       # streamable HTTP at http://localhost:8000/mcp
 ```
 
+## Run the demo
+
+`demos/gloss_demo.py` shows the real code and data end to end. It makes no model call, so it needs no API key.
+
+```
+pip install -e ".[agent]"
+python demos/gloss_demo.py
+```
+
+It calls the MCP server through a real MCP client (including three queries the guard refuses), shows one question
+answered six ways as the company's rules are applied one by one, and replays three stored runs from the frozen test set.
+
 ## Retrieval check (development questions only, no model involved)
 
 `PYTHONPATH=src python scripts/eval_retrieval.py` asks: for each of the 20 development questions that need a definition, did the retriever bring back every rule and metric chunk the answer depends on? The query is the question text. Full output is in `results/retrieval_dev.json`.
