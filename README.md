@@ -35,7 +35,7 @@ PYTHONPATH=src python -m gloss.mcp_server --db data/gloss.duckdb --http       # 
 `demos/gloss_demo.py` shows the real code and data end to end. It makes no model call, so it needs no API key.
 
 ```
-pip install -e ".[agent]"
+pip install -e .
 python demos/gloss_demo.py
 ```
 

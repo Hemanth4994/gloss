@@ -1,6 +1,6 @@
 """Gloss demo: real code, real data, real stored model runs. No model call is made by this script.
 
-From the root of the gloss folder (after `pip install -e ".[agent]"` and building data/gloss.duckdb):
+From the root of the gloss folder (after `pip install -e .` and building data/gloss.duckdb):
     python demos/gloss_demo.py                      # or: python demos/gloss_demo.py path/to/gloss.duckdb
 """
 import asyncio
