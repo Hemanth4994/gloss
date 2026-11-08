@@ -3,7 +3,9 @@
 Ask your data, grounded in your definitions. An open-source MCP server and a LangGraph agent for a data warehouse, with a
 measured evaluation of when the agent is right, wrong, or should refuse.
 
-**Status: data, definitions, MCP server, evaluation set, agent and evaluation runner are built, and the frozen test split has been run once in each of three configurations (results below). Not done yet: the public deployment.** See [PLAN.md](PLAN.md).
+**Status: data, definitions, MCP server, evaluation set, agent and evaluation runner are built, and the frozen test split has been run once in each of three configurations (results below).** See [PLAN.md](PLAN.md).
+
+**Live demo:** https://gloss-z7rc.onrender.com (web page) and https://gloss-z7rc.onrender.com/mcp (MCP endpoint, streamable HTTP). It runs on Render's free tier, so it sleeps when idle and the first request after a pause takes about a minute. The Tools tab needs no key; the agent tab uses a Gemini key you paste or a small daily shared budget.
 
 ## What exists
 
