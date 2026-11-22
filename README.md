@@ -7,6 +7,59 @@ measured evaluation of when the agent is right, wrong, or should refuse.
 
 **Live demo:** https://gloss-z7rc.onrender.com (web page) and https://gloss-z7rc.onrender.com/mcp (MCP endpoint, streamable HTTP). It runs on Render's free tier, so it sleeps when idle and the first request after a pause takes about a minute. The Tools tab needs no key; the agent tab uses a Gemini key you paste or a small daily shared budget.
 
+## How it fits together
+
+```mermaid
+flowchart TB
+    mcpc["Claude Desktop, MCP Inspector,<br/>any MCP client"] --> mcp["MCP server<br/>stdio, or streamable HTTP<br/>(the /mcp path on the Render demo)"]
+    mcp --> tools["Four read-only tools (tools.py)<br/>list_tables, describe_table, search_definitions, run_sql"]
+    page["Render demo page (Gradio)<br/>Tools tab and Agent tab"] --> tools
+    page --> agent["LangGraph agent + Gemini<br/>calls the same tool functions directly"]
+    agent --> tools
+
+    tools -->|run_sql| guard["sqlguard, then a read-only connection<br/>one SELECT, allow-listed tables, no file access,<br/>row cap, timeout"]
+    tools -->|list_tables, describe_table| db[("DuckDB warehouse")]
+    guard --> db
+    tools -->|search_definitions, BM25| dic["dictionary.yaml<br/>rules, table docs, 9 metrics"]
+
+    gen["datagen.py<br/>synthetic store, planted traps, fixed seed"] --> pipe["pipeline.py<br/>quality rules + data-quality report"]
+    pipe --> db
+```
+
+A client reaches the warehouse only through four read-only tools. `run_sql` goes through a static SQL check and then a read-only DuckDB connection with no file or network access, so one mistake in one layer is not enough. The agent and the demo page call the same tool functions the MCP server exposes.
+
+## How the agent answers one question
+
+```mermaid
+flowchart TB
+    q([A business question]) --> retrieve["retrieve<br/>definitions: all rules + BM25 top 3<br/>tables: table docs only<br/>none: bare schema"]
+    retrieve --> plan["plan<br/>Gemini returns structured output:<br/>sql, definitions_used, assumptions, answerable"]
+    plan -->|the data cannot answer it| refused([Refuse, with a reason])
+    plan -->|SQL returned| execute["execute<br/>guard, then read-only DuckDB"]
+    execute -->|rows| finish["finish<br/>answer built from the result<br/>and the cited definitions"]
+    plan -->|unusable reply| budget
+    execute -->|guard or SQL error| budget{"repairs used<br/>so far under 2?"}
+    budget -->|yes: repair| plan
+    budget -->|no| fail([Fail: no answer])
+```
+
+At most three model calls per question: the first plan and at most two repairs. The three configurations (`definitions`, `tables`, `none`) differ only in what `retrieve` puts in front of the model; the system prompt is identical and contains no business rule.
+
+## How it is evaluated
+
+```mermaid
+flowchart LR
+    qs["eval/questions.yaml<br/>60 questions (30 dev, 30 test)<br/>12 definition, 8 join,<br/>5 control, 5 unanswerable"] --> gold["gold answers: eval/gold_answers.json<br/>built from gold SQL with trap macros<br/>(scripts/make_gold.py)"]
+    qs --> run["scripts/run_eval.py<br/>one split, one configuration"]
+    tag{{"test split runs only if tag frozen-v1<br/>exists and src, eval, scripts, tests match it"}} -.-> run
+    run --> cfg["agent in 3 configurations<br/>definitions, tables, none<br/>same prompt, same model"]
+    cfg --> score["score: execution accuracy<br/>final SQL result vs gold result<br/>refusal is right only if unanswerable"]
+    gold --> score
+    score --> out["results/*.jsonl<br/>and the failure analysis"]
+```
+
+Each wrong answer is tagged afterwards (see the failure analysis below). The test split was run once per configuration, on the code tagged `frozen-v1`.
+
 ## What exists
 
 - `src/gloss/datagen.py`: synthetic online-store data with a fixed seed and planted traps (test accounts, cancelled and returned orders, refunds in their own table, UTC timestamps reported in IST) plus a known number of injected dirty rows.
