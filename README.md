@@ -1,5 +1,7 @@
 # Gloss
 
+[![ci](https://github.com/Hemanth4994/gloss/actions/workflows/ci.yml/badge.svg)](https://github.com/Hemanth4994/gloss/actions/workflows/ci.yml)
+
 Ask your data, grounded in your definitions. An open-source MCP server and a LangGraph agent for a data warehouse, with a
 measured evaluation of when the agent is right, wrong, or should refuse.
 
