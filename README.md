@@ -7,15 +7,15 @@ measured evaluation of when the agent is right, wrong, or should refuse.
 
 **Status: data, definitions, MCP server, evaluation set, agent and evaluation runner are built, and the frozen test split has been run once in each of three configurations (results below).** See [PLAN.md](PLAN.md).
 
-**Live demo:** https://gloss-z7rc.onrender.com (web page) and https://gloss-z7rc.onrender.com/mcp (MCP endpoint, streamable HTTP). It runs on Render's free tier, so it sleeps when idle and the first request after a pause takes about a minute. The Tools tab needs no key; the agent tab uses a Gemini key you paste or a small daily shared budget.
+**Try it locally:** no API key needed. Build the warehouse and run the demo ([commands below](#run-the-demo)), or start the web page on your own machine.
 
 ## How it fits together
 
 ```mermaid
 flowchart TB
-    mcpc["Claude Desktop, MCP Inspector,<br/>any MCP client"] --> mcp["MCP server<br/>stdio, or streamable HTTP<br/>(the /mcp path on the Render demo)"]
+    mcpc["Claude Desktop, MCP Inspector,<br/>any MCP client"] --> mcp["MCP server<br/>stdio, or streamable HTTP<br/>(the /mcp path of the web app)"]
     mcp --> tools["Four read-only tools (tools.py)<br/>list_tables, describe_table, search_definitions, run_sql"]
-    page["Render demo page (Gradio)<br/>Tools tab and Agent tab"] --> tools
+    page["Demo page (Gradio)<br/>Tools tab and Agent tab"] --> tools
     page --> agent["LangGraph agent + Gemini<br/>calls the same tool functions directly"]
     agent --> tools
 
@@ -93,11 +93,21 @@ PYTHONPATH=src python -m gloss.mcp_server --db data/gloss.duckdb --http       # 
 
 ```
 pip install -e .
+python -m gloss.pipeline --out data/gloss.duckdb    # build the synthetic warehouse once; the demo reads it
 python demos/gloss_demo.py
 ```
 
 It calls the MCP server through a real MCP client (including three queries the guard refuses), shows one question
 answered six ways as the company's rules are applied one by one, and replays three stored runs from the frozen test set.
+
+To open the web page (Tools, Agent and Evaluation tabs) on your own machine at http://localhost:7860:
+
+```
+pip install -e ".[agent,app]"
+GLOSS_DB=data/gloss.duckdb python space/app.py
+```
+
+The Tools and Evaluation tabs need no key. The Agent tab needs a Gemini key, which you paste into the page.
 
 ## Retrieval check (development questions only, no model involved)
 
