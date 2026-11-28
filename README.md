@@ -9,6 +9,8 @@ measured evaluation of when the agent is right, wrong, or should refuse.
 
 **Try it locally:** no API key needed. Build the warehouse and run the demo ([commands below](#run-the-demo)), or start the web page on your own machine.
 
+![Screen recording of the Gloss web page on the synthetic warehouse: search the company's definitions for a question, run a guarded SELECT, and open the Evaluation tab](docs/img/demo.gif)
+
 ## What it looks like
 
 Real screenshots of the code running on the synthetic warehouse, taken from the commands in [Run the demo](#run-the-demo).
