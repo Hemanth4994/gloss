@@ -9,6 +9,22 @@ measured evaluation of when the agent is right, wrong, or should refuse.
 
 **Try it locally:** no API key needed. Build the warehouse and run the demo ([commands below](#run-the-demo)), or start the web page on your own machine.
 
+## What it looks like
+
+Real screenshots of the code running on the synthetic warehouse, taken from the commands in [Run the demo](#run-the-demo).
+
+**Why definitions matter: one question, six answers.** The same "net revenue, one month" question gives 5,832,323 with no rules and 2,175,470 once every company rule is applied. This is the output of `python demos/gloss_demo.py`.
+
+![Terminal output of the Gloss demo: net revenue for one month goes from 5,832,323 to 2,175,470 as each rule is applied](docs/img/demo-six-answers.png)
+
+**The web page, Tools tab.** The same four read-only tools the MCP server exposes: BM25 definition search, and `run_sql` through the guard and a read-only connection.
+
+![Gloss web page, Tools tab: search_definitions for "what was net revenue last month" returns the net_revenue metric, and run_sql returns order counts by status](docs/img/web-tools.png)
+
+**The web page, Evaluation tab.** The frozen test split: 27/30 with definitions, 11/30 with table docs only, 10/30 with the bare schema.
+
+![Gloss web page, Evaluation tab: results table for the three configurations](docs/img/web-evaluation.png)
+
 ## How it fits together
 
 ```mermaid
